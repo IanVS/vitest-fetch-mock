@@ -119,19 +119,23 @@ describe('Mocking aborts', () => {
   });
 
   it('throws when passed an already aborted abort signal in the request init', () => {
-    const c = new AbortController();
-    c.abort();
-    expect(() => fetch('/', { signal: c.signal })).toThrow(expect.any(DOMException));
+    if (typeof AbortController !== 'undefined') {
+      const c = new AbortController();
+      c.abort();
+      expect(() => fetch('/', { signal: c.signal })).toThrow(expect.any(DOMException));
+    }
   });
 
   it('rejects when aborted before resolved', async () => {
-    const c = new AbortController();
-    fetch.mockResponse(async () => {
-      vi.advanceTimersByTime(60);
-      return '';
-    });
-    setTimeout(() => c.abort(), 50);
-    await expect(fetch('/', { signal: c.signal })).rejects.toThrow(expect.any(DOMException));
+    if (typeof AbortController !== 'undefined') {
+      const c = new AbortController();
+      fetch.mockResponse(async () => {
+        vi.advanceTimersByTime(60);
+        return '';
+      });
+      setTimeout(() => c.abort(), 50);
+      await expect(fetch('/', { signal: c.signal })).rejects.toThrow(expect.any(DOMException));
+    }
   });
 });
 
