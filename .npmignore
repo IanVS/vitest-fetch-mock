@@ -1,7 +1,0 @@
-tests
-yarn.lock
-node_modules
-*.log
-coverage
-.idea
-.vscode

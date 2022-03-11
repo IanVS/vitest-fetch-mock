@@ -6,6 +6,10 @@
   "main": "src/index.js",
   "module": "src/index.js",
   "types": "types",
+  "files": [
+    "src",
+    "types/index.d.ts"
+  ],
   "scripts": {
     "test": "vitest run && npm run tsc && npm run lint",
     "lint": "eslint .",
