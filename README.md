@@ -1,11 +1,20 @@
-# Jest Fetch Mock
+# Vitest Fetch Mock
 
-![npm downloads](https://img.shields.io/npm/dw/jest-fetch-mock)
-![Node.js CI](https://github.com/jefflau/jest-fetch-mock/workflows/Node.js%20CI/badge.svg)
+![Node.js CI](https://github.com/IanVS/vitest-fetch-mock/workflows/Node.js%20CI/badge.svg)
 
-Fetch is the canonical way to do HTTP requests in the browser, and it can be used in other environments such as React Native. Jest Fetch Mock allows you to easily mock your `fetch` calls and return the response you need to fake the HTTP requests. It's easy to setup and you don't need a library like `nock` to get going and it uses Jest's built-in support for mocking under the surface. This means that any of the `jest.fn()` methods are also available. For more information on the jest mock API, check their docs [here](https://facebook.github.io/jest/docs/en/mock-functions.html)
+This project was forked from [jest-fetch-mock](https://github.com/jefflau/jest-fetch-mock), and tweaked slightly to run
+with vitest instead of jest. It is mostly compatible with `jest-fetch-mock`, with the main difference being that you
+need to create fetchMock with a function call, and provide `vi` to it, rather than relying on a global `vi` or (`jest`
+in jest-fetch-mock's case). See [Usage](#usage) for more details.
 
-It currently supports the mocking with the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) polyfill, so it supports Node.js and any browser-like runtime.
+Fetch is the canonical way to do HTTP requests in the browser, and it can be used in other environments such as React
+Native. Vitest Fetch Mock allows you to easily mock your `fetch` calls and return the response you need to fake the HTTP
+requests. It's easy to setup and you don't need a library like `nock` to get going and it uses Vitest's built-in support
+for mocking under the surface. This means that any of the `vi.fn()` methods are also available. For more information on
+the vitest mock API, check their docs [here](https://vitest.dev/guide/mocking.html)
+
+It currently supports the mocking with the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) polyfill, so it
+supports Node.js and any browser-like runtime.
 
 ## Contents
 
@@ -30,53 +39,62 @@ It currently supports the mocking with the [`cross-fetch`](https://www.npmjs.com
 To setup your fetch mock you need to do the following things:
 
 ```
-$ npm install --save-dev jest-fetch-mock
+$ npm install --save-dev vitest-fetch-mock
 ```
 
-Create a `setupJest` file to setup the mock or add this to an existing `setupFile`. :
+Create a `setupVitest` file to setup the mock or add this to an existing `setupFile`. :
 
 ### To setup for all tests
 
 ```js
-//setupJest.js or similar file
-require('jest-fetch-mock').enableMocks()
+//setupVitest.js or similar file
+import createFetchMock from 'vitest-fetch-mock';
+import { vi } from 'vitest';
+
+const fetchMock = createFetchMock(vi);
+
+// sets globalThis.fetch and globalThis.fetchMock to our mocked version
+fetchMock.enableMocks();
 ```
 
-Add the setupFile to your jest config in `package.json`:
+Add the setup file to your vitest [config](https://vitest.dev/config/#setupfiles):
 
 ```JSON
-"jest": {
-  "automock": false,
-  "resetMocks": false,
+"test": {
   "setupFiles": [
-    "./setupJest.js"
+    "./setupVitest.js"
   ]
 }
 ```
 
-With this done, you'll have `fetch` and `fetchMock` available on the global scope. Fetch will be used as usual by your code and you'll use `fetchMock` in your tests
-
-Note: the `resetMocks` Jest configuration default was changed from `false` to `true` in Jest 4.0.1.  Therefore the Jest configuration of setting it to `false` is required if the `setupJest.js` is what calls "enableMocks()" (i.e. in the above suggested setup) otherwise you will need to call "enableMocks()" in a "beforeEach" block.
+With this done, you'll have `fetch` and `fetchMock` available on the global scope. Fetch will be used as usual by your
+code and you'll use `fetchMock` in your tests
 
 #### Default not mocked
 
-If you would like to have the 'fetchMock' available in all tests but not enabled then add `fetchMock.dontMock()` after the `...enableMocks()` line in `setupJest.js`:
+If you would like to have the 'fetchMock' available in all tests but not enabled then add `fetchMock.dontMock()` after
+the `...enableMocks()` line in `setupVitest.js`:
 
 ```js
+import createFetchMock from 'vitest-fetch-mock';
+import { vi } from 'vitest';
+const fetchMock = createFetchMock(vi);
+
 // adds the 'fetchMock' global variable and rewires 'fetch' global to call 'fetchMock' instead of the real implementation
-require('jest-fetch-mock').enableMocks()
+fetchMock.enableMocks();
+
 // changes default behavior of fetchMock to use the real 'fetch' implementation and not mock responses
-fetchMock.dontMock()
+fetchMock.dontMock();
 ```
 
-If you want a single test file to return to the default behavior of mocking all responses, add the following to the
-test file:
+If you want a single test file to return to the default behavior of mocking all responses, add the following to the test
+file:
 
 ```js
 beforeEach(() => {
   // if you have an existing `beforeEach` just add the following line to it
-  fetchMock.doMock()
-})
+  fetchMock.doMock();
+});
 ```
 
 To enable mocking for a specific URL only:
@@ -84,31 +102,31 @@ To enable mocking for a specific URL only:
 ```js
 beforeEach(() => {
   // if you have an existing `beforeEach` just add the following lines to it
-  fetchMock.mockIf(/^https?:\/\/example.com.*$/, req => {
+  fetchMock.mockIf(/^https?:\/\/example.com.*$/, (req) => {
     if (req.url.endsWith('/path1')) {
-      return 'some response body'
+      return 'some response body';
     } else if (req.url.endsWith('/path2')) {
       return {
         body: 'another response body',
         headers: {
-          'X-Some-Response-Header': 'Some header value'
-        }
-      }
+          'X-Some-Response-Header': 'Some header value',
+        },
+      };
     } else {
       return {
         status: 404,
-        body: 'Not Found'
-      }
+        body: 'Not Found',
+      };
     }
-  })
-})
+  });
+});
 ```
 
-If you have changed the default behavior to use the real implementation, you can guarantee the next call to fetch
-will be mocked by using the `mockOnce` function:
+If you have changed the default behavior to use the real implementation, you can guarantee the next call to fetch will
+be mocked by using the `mockOnce` function:
 
 ```js
-fetchMock.mockOnce('the next call to fetch will always return this as the body')
+fetchMock.mockOnce('the next call to fetch will always return this as the body');
 ```
 
 This function behaves exactly like `fetchMock.once` but guarantees the next call to `fetch` will be mocked even if the
@@ -117,48 +135,23 @@ to `fetchMock.mockOnce` without a risk of changing their behavior.
 
 ### To setup for an individual test
 
-For JavaScript add the following line to the start of your test case (before any other requires)
+Add the following line to the start of your test case (before any other imports)
 
 ```js
-require('jest-fetch-mock').enableMocks()
-```
+import createFetchMock from 'vitest-fetch-mock';
+import { vi } from 'vitest';
 
-For TypeScript/ES6 add the following lines to the start of your test case (before any other imports)
-
-```typescript
-import { enableFetchMocks } from 'jest-fetch-mock'
-enableFetchMocks()
+const fetchMock = createFetchMock(vi);
+fetchMock.enableMocks();
 ```
 
 #### TypeScript importing
 
-If you are using TypeScript and receive errors about the `fetchMock` global not existing,
-add a `global.d.ts` file to the root of your project (or add the following line to an existing global file):
+If you are using TypeScript and receive errors about the `fetchMock` global not existing, add a `global.d.ts` file to
+the root of your project (or add the following line to an existing global file):
 
 ```typescript
-import 'jest-fetch-mock'
-```
-
-If you prefer you can also just import the fetchMock in a test case.
-
-```typescript
-import fetchMock from 'jest-fetch-mock'
-```
-
-You may also need to edit your `tsconfig.json` and add "dom" and/or "es2015" and/or "esnext" to the 'compilerConfig.lib' property
-
-### Using with Create-React-App
-
-If you are using [Create-React-App](https://github.com/facebookincubator/create-react-app) (CRA), the code for `setupJest.js` above should be placed into `src/setupTests.js` in the root of your project. CRA automatically uses this filename by convention in the Jest configuration it generates. Similarly, changing to your `package.json` is not required as CRA handles this when generating your Jest configuration.
-
-### For Ejected Create React Apps _ONLY_:
-
-> Note: Keep in mind that if you decide to "eject" before creating src/setupTests.js, the resulting package.json file won't contain any reference to it, so you should manually create the property setupTestFrameworkScriptFile in the configuration for Jest, something like the [following](https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md#srcsetuptestsjs-1):
-
-```JSON
-"jest": {
-  "setupTestFrameworkScriptFile": "<rootDir>/src/setupTests.js"
- }
+import 'vitest-fetch-mock';
 ```
 
 ## API
@@ -177,42 +170,39 @@ If you are using [Create-React-App](https://github.com/facebookincubator/create-
 
 ### Functions
 
-Instead of passing body, it is also possible to pass a function that returns a promise.
-The promise should resolve with a string or an object containing body and init props
+Instead of passing body, it is also possible to pass a function that returns a promise. The promise should resolve with
+a string or an object containing body and init props
 
 i.e:
 
 ```js
-fetch.mockResponse(() => callMyApi().then(res => ({ body: 'ok' })))
+fetch.mockResponse(() => callMyApi().then((res) => ({ body: 'ok' })));
 // OR
-fetch.mockResponse(() => callMyApi().then(res => 'ok'))
+fetch.mockResponse(() => callMyApi().then((res) => 'ok'));
 ```
 
 The function may take an optional "request" parameter of type `http.Request`:
 
 ```js
-fetch.mockResponse(req =>
-  req.url === 'http://myapi/'
-    ? callMyApi().then(res => 'ok')
-    : Promise.reject(new Error('bad url'))
-)
+fetch.mockResponse((req) =>
+  req.url === 'http://myapi/' ? callMyApi().then((res) => 'ok') : Promise.reject(new Error('bad url'))
+);
 ```
 
-Note: the request "url" is parsed and then printed using the equivalent of `new URL(input).href` so it may not match exactly with the URL's passed to `fetch` if they are not fully qualified.
-For example, passing "http://foo.com" to `fetch` will result in the request URL being "http://foo.com/" (note the trailing slash).
+Note: the request "url" is parsed and then printed using the equivalent of `new URL(input).href` so it may not match
+exactly with the URL's passed to `fetch` if they are not fully qualified. For example, passing "http://foo.com" to
+`fetch` will result in the request URL being "http://foo.com/" (note the trailing slash).
 
 The same goes for rejects:
 
 ```js
-fetch.mockReject(() =>
-  doMyAsyncJob().then(res => Promise.reject(res.errorToRaise))
-)
+fetch.mockReject(() => doMyAsyncJob().then((res) => Promise.reject(res.errorToRaise)));
 // OR
-fetch.mockReject(req =>
+fetch.mockReject((req) =>
   req.headers.get('content-type') === 'text/plain'
     ? Promise.reject('invalid content type')
-    : doMyAsyncJob().then(res => Promise.reject(res.errorToRaise))
-)
+    : doMyAsyncJob().then((res) => Promise.reject(res.errorToRaise))
+);
 ```
 
 ### Mock utilities
@@ -220,84 +210,95 @@ fetch.mockReject(req =>
 - `fetch.resetMocks()` - Clear previously set mocks so they do not bleed into other mocks
 - `fetch.enableMocks()` - Enable fetch mocking by overriding `global.fetch` and mocking `node-fetch`
 - `fetch.disableMocks()` - Disable fetch mocking and restore default implementation of `fetch` and/or `node-fetch`
-- `fetch.mock` - The mock state for your fetch calls. Make assertions on the arguments given to `fetch` when called by the functions you are testing. For more information check the [Jest docs](https://facebook.github.io/jest/docs/en/mock-functions.html#mock-property)
+- `fetch.mock` - The mock state for your fetch calls. Make assertions on the arguments given to `fetch` when called by
+  the functions you are testing. For more information check the
+  [vitest docs](https://vitest.dev/api/#mockinstance-properties)
 
-For information on the arguments body and init can take, you can look at the MDN docs on the Response Constructor function, which `jest-fetch-mock` uses under the surface.
+For information on the arguments body and init can take, you can look at the MDN docs on the Response Constructor
+function, which `vitest-fetch-mock` uses under the surface.
 
 https://developer.mozilla.org/en-US/docs/Web/API/Response/Response
 
-Each mocked response or err
-or will return a [Mock Function](http://facebook.github.io/jest/docs/mock-function-api.html#content). You can use methods like `.toHaveBeenCalledWith` to ensure that the mock function was called with specific arguments. For more methods detail, take a look at [this](http://facebook.github.io/jest/docs/expect.html#content).
+Each mocked response or err or will return a [MockInstance Function](https://vitest.dev/api/#getmockname). You can use
+methods like `.toHaveBeenCalledWith` to ensure that the mock function was called with specific arguments. For more
+methods detail, take a look at [this](https://vitest.dev/api/#expect).
 
 ## Examples
 
-In most of the complicated examples below, I am testing my action creators in Redux, but it doesn't have to be used with Redux.
+In most of the complicated examples below, I am testing my action creators in Redux, but it doesn't have to be used with
+Redux.
 
 ### Simple mock and assert
 
-In this simple example I won't be using any libraries. It is a simple fetch request, in this case to google.com. First we setup the `beforeEach` callback to reset our mocks. This isn't strictly necessary in this example, but since we will probably be mocking fetch more than once, we need to reset it across our tests to assert on the arguments given to fetch. Make sure the function wrapping your test is marked as async. 
+In this simple example I won't be using any libraries. It is a simple fetch request, in this case to google.com. First
+we setup the `beforeEach` callback to reset our mocks. This isn't strictly necessary in this example, but since we will
+probably be mocking fetch more than once, we need to reset it across our tests to assert on the arguments given to
+fetch. Make sure the function wrapping your test is marked as async.
 
-Once we've done that we can start to mock our response. We want to give it an object with a `data` property and a string value of `12345` and wrap it in `JSON.stringify` to JSONify it. Here we use `mockResponseOnce`, but we could also use `once`, which is an alias for a call to `mockResponseOnce`.
+Once we've done that we can start to mock our response. We want to give it an object with a `data` property and a string
+value of `12345` and wrap it in `JSON.stringify` to JSONify it. Here we use `mockResponseOnce`, but we could also use
+`once`, which is an alias for a call to `mockResponseOnce`.
 
-We then call the function that we want to test with the arguments we want to test with. We use `await` to wait until the response resolves, and then assert we have got the correct data back.
+We then call the function that we want to test with the arguments we want to test with. We use `await` to wait until the
+response resolves, and then assert we have got the correct data back.
 
-Finally we can assert on the `.mock` state that Jest provides for us to test what arguments were given to fetch and how many times it was called
+Finally we can assert on the `.mock` state that Vitest provides for us to test what arguments were given to fetch and
+how many times it was called
 
 ```js
 //api.js
 export function APIRequest(who) {
   if (who === 'google') {
-    return fetch('https://google.com').then(res => res.json())
+    return fetch('https://google.com').then((res) => res.json());
   } else {
-    return 'no argument provided'
+    return 'no argument provided';
   }
 }
 ```
 
 ```js
 //api.test.js
-import { APIRequest } from './api'
+import { APIRequest } from './api';
 
 describe('testing api', () => {
   beforeEach(() => {
-    fetch.resetMocks()
-  })
+    fetch.resetMocks();
+  });
 
   it('calls google and returns data to me', async () => {
-    fetch.mockResponseOnce(JSON.stringify({ data: '12345' }))
+    fetch.mockResponseOnce(JSON.stringify({ data: '12345' }));
 
     //assert on the response
-    const res = await APIRequest('google')
-    expect(res.data).toEqual('12345')
+    const res = await APIRequest('google');
+    expect(res.data).toEqual('12345');
 
     //assert on the times called and arguments given to fetch
-    expect(fetch.mock.calls.length).toEqual(1)
-    expect(fetch.mock.calls[0][0]).toEqual('https://google.com')
-  })
-})
+    expect(fetch.mock.calls.length).toEqual(1);
+    expect(fetch.mock.calls[0][0]).toEqual('https://google.com');
+  });
+});
 ```
 
 ### Mocking all fetches
 
-In this example I am mocking just one fetch call. Any additional fetch calls in the same function will also have the same mock response. For more complicated functions with multiple fetch calls, you can check out example 3.
+In this example I am mocking just one fetch call. Any additional fetch calls in the same function will also have the
+same mock response. For more complicated functions with multiple fetch calls, you can check out example 3.
 
 ```js
-import configureMockStore from 'redux-mock-store' // mock store
-import thunk from 'redux-thunk'
+import configureMockStore from 'redux-mock-store'; // mock store
+import thunk from 'redux-thunk';
 
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
 
-import { getAccessToken } from './accessToken'
+import { getAccessToken } from './accessToken';
 
 describe('Access token action creators', () => {
   it('dispatches the correct actions on successful fetch request', () => {
-    fetch.mockResponse(JSON.stringify({ access_token: '12345' }))
+    fetch.mockResponse(JSON.stringify({ access_token: '12345' }));
 
-    const expectedActions = [
-      { type: 'SET_ACCESS_TOKEN', token: { access_token: '12345' } }
-    ]
-    const store = mockStore({ config: { token: '' } })
+    const expectedActions = [{ type: 'SET_ACCESS_TOKEN', token: { access_token: '12345' } }];
+    const store = mockStore({ config: { token: '' } });
 
     return (
       store
@@ -305,34 +306,34 @@ describe('Access token action creators', () => {
         //getAccessToken contains the fetch call
         .then(() => {
           // return of async actions
-          expect(store.getActions()).toEqual(expectedActions)
+          expect(store.getActions()).toEqual(expectedActions);
         })
-    )
-  })
-})
+    );
+  });
+});
 ```
 
 ### Mocking a failed fetch
 
-In this example I am mocking just one fetch call but this time using the `mockReject` function to simulate a failed request. Any additional fetch calls in the same function will also have the same mock response. For more complicated functions with multiple fetch calls, you can check out example 3.
+In this example I am mocking just one fetch call but this time using the `mockReject` function to simulate a failed
+request. Any additional fetch calls in the same function will also have the same mock response. For more complicated
+functions with multiple fetch calls, you can check out example 3.
 
 ```js
-import configureMockStore from 'redux-mock-store' // mock store
-import thunk from 'redux-thunk'
+import configureMockStore from 'redux-mock-store'; // mock store
+import thunk from 'redux-thunk';
 
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
 
-import { getAccessToken } from './accessToken'
+import { getAccessToken } from './accessToken';
 
 describe('Access token action creators', () => {
   it('dispatches the correct actions on a failed fetch request', () => {
-    fetch.mockReject(new Error('fake error message'))
+    fetch.mockReject(new Error('fake error message'));
 
-    const expectedActions = [
-      { type: 'SET_ACCESS_TOKEN_FAILED', error: { status: 503 } }
-    ]
-    const store = mockStore({ config: { token: '' } })
+    const expectedActions = [{ type: 'SET_ACCESS_TOKEN_FAILED', error: { status: 503 } }];
+    const store = mockStore({ config: { token: '' } });
 
     return (
       store
@@ -340,11 +341,11 @@ describe('Access token action creators', () => {
         //getAccessToken contains the fetch call
         .then(() => {
           // return of async actions
-          expect(store.getActions()).toEqual(expectedActions)
+          expect(store.getActions()).toEqual(expectedActions);
         })
-    )
-  })
-})
+    );
+  });
+});
 ```
 
 ### Mocking aborted fetches
@@ -361,78 +362,82 @@ Fetches can be mocked to act as if they were aborted during the request. This ca
 ```js
 describe('Mocking aborts', () => {
   beforeEach(() => {
-    fetch.resetMocks()
-    fetch.doMock()
-    jest.useFakeTimers()
-  })
+    fetch.resetMocks();
+    fetch.doMock();
+    vi.useFakeTimers();
+  });
   afterEach(() => {
-    jest.useRealTimers()
-  })
+    vi.useRealTimers();
+  });
 
   it('rejects with an Aborted! Error', () => {
-    fetch.mockAbort()
-    expect(fetch('/')).rejects.toThrow('Aborted!')
-  })
+    fetch.mockAbort();
+    expect(fetch('/')).rejects.toThrow('Aborted!');
+  });
   it('rejects with an Aborted! Error once then mocks with empty response', async () => {
-    fetch.mockAbortOnce()
-    await expect(fetch('/')).rejects.toThrow('Aborted!')
-    await expect(request()).resolves.toEqual('')
-  })
+    fetch.mockAbortOnce();
+    await expect(fetch('/')).rejects.toThrow('Aborted!');
+    await expect(request()).resolves.toEqual('');
+  });
 
   it('throws when passed an already aborted abort signal', () => {
-    const c = new AbortController()
-    c.abort()
-    expect(() => fetch('/', { signal: c.signal })).toThrow('Aborted!')
-  })
+    const c = new AbortController();
+    c.abort();
+    expect(() => fetch('/', { signal: c.signal })).toThrow('Aborted!');
+  });
 
   it('rejects when aborted before resolved', async () => {
-    const c = new AbortController()
+    const c = new AbortController();
     fetch.mockResponse(async () => {
-      jest.advanceTimersByTime(60)
-      return ''
-    })
-    setTimeout(() => c.abort(), 50)
-    await expect(fetch('/', { signal: c.signal })).rejects.toThrow('Aborted!')
-  })
-})
+      vi.advanceTimersByTime(60);
+      return '';
+    });
+    setTimeout(() => c.abort(), 50);
+    await expect(fetch('/', { signal: c.signal })).rejects.toThrow('Aborted!');
+  });
+});
 ```
 
-
 ### Mocking a redirected response
-Set the counter option >= 1 in the response init object to mock a redirected response https://developer.mozilla.org/en-US/docs/Web/API/Response/redirected. Note, this will only work in Node.js as it's a feature of node fetch's response class https://github.com/node-fetch/node-fetch/blob/master/src/response.js#L39.
+
+Set the counter option >= 1 in the response init object to mock a redirected response
+https://developer.mozilla.org/en-US/docs/Web/API/Response/redirected. Note, this will only work in Node.js as it's a
+feature of node fetch's response class https://github.com/node-fetch/node-fetch/blob/master/src/response.js#L39.
 
 ```js
-fetchMock.mockResponse("<main></main>", {
+fetchMock.mockResponse('<main></main>', {
   counter: 1,
   status: 200,
-  statusText: "ok",
+  statusText: 'ok',
 });
 ```
 
 ### Mocking multiple fetches with different responses
 
-In this next example, the store does not yet have a token, so we make a request to get an access token first. This means that we need to mock two different responses, one for each of the fetches. Here we can use `fetch.mockResponseOnce` or `fetch.once` to mock the response only once and call it twice. Because we return the mocked function, we can chain this jQuery style. It internally uses Jest's `mockImplementationOnce`. You can read more about it on the [Jest documentation](https://facebook.github.io/jest/docs/mock-functions.html#content)
+In this next example, the store does not yet have a token, so we make a request to get an access token first. This means
+that we need to mock two different responses, one for each of the fetches. Here we can use `fetch.mockResponseOnce` or
+`fetch.once` to mock the response only once and call it twice. Because we return the mocked function, we can chain this
+jQuery style. It internally uses Vitest's `mockImplementationOnce`. You can read more about it on the
+[Vitest documentation](https://vitest.dev/api/#mockimplementationonce)
 
 ```js
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
+import configureMockStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
 
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
 
-import { getAnimeDetails } from './animeDetails'
+import { getAnimeDetails } from './animeDetails';
 
 describe('Anime details action creators', () => {
   it('dispatches requests for an access token before requesting for animeDetails', () => {
-    fetch
-      .once(JSON.stringify({ access_token: '12345' }))
-      .once(JSON.stringify({ name: 'naruto' }))
+    fetch.once(JSON.stringify({ access_token: '12345' })).once(JSON.stringify({ name: 'naruto' }));
 
     const expectedActions = [
       { type: 'SET_ACCESS_TOKEN', token: { access_token: '12345' } },
-      { type: 'SET_ANIME_DETAILS', animeDetails: { name: 'naruto' } }
-    ]
-    const store = mockStore({ config: { token: null } })
+      { type: 'SET_ANIME_DETAILS', animeDetails: { name: 'naruto' } },
+    ];
+    const store = mockStore({ config: { token: null } });
 
     return (
       store
@@ -440,44 +445,36 @@ describe('Anime details action creators', () => {
         //getAnimeDetails contains the 2 fetch calls
         .then(() => {
           // return of async actions
-          expect(store.getActions()).toEqual(expectedActions)
+          expect(store.getActions()).toEqual(expectedActions);
         })
-    )
-  })
-})
+    );
+  });
+});
 ```
 
 ### Mocking multiple fetches with `fetch.mockResponses`
 
-`fetch.mockResponses` takes as many arguments as you give it, all of which are arrays representing each Response Object. It will then call the `mockImplementationOnce` for each response object you give it. This reduces the amount of boilerplate code you need to write. An alternative is to use `.once` and chain it multiple times if you don't like wrapping each response arguments in a tuple/array.
+`fetch.mockResponses` takes as many arguments as you give it, all of which are arrays representing each Response Object.
+It will then call the `mockImplementationOnce` for each response object you give it. This reduces the amount of
+boilerplate code you need to write. An alternative is to use `.once` and chain it multiple times if you don't like
+wrapping each response arguments in a tuple/array.
 
-In this example our actionCreator calls `fetch` 4 times, once for each season of the year and then concatenates the results into one final array. You'd have to write `fetch.mockResponseOnce` 4 times to achieve the same thing:
+In this example our actionCreator calls `fetch` 4 times, once for each season of the year and then concatenates the
+results into one final array. You'd have to write `fetch.mockResponseOnce` 4 times to achieve the same thing:
 
 ```js
 describe('getYear action creator', () => {
   it('dispatches the correct actions on successful getSeason fetch request', () => {
     fetch.mockResponses(
-      [
-        JSON.stringify([{ name: 'naruto', average_score: 79 }]),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify([{ name: 'bleach', average_score: 68 }]),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify([{ name: 'one piece', average_score: 80 }]),
-        { status: 200 }
-      ],
-      [
-        JSON.stringify([{ name: 'shingeki', average_score: 91 }]),
-        { status: 200 }
-      ]
-    )
+      [JSON.stringify([{ name: 'naruto', average_score: 79 }]), { status: 200 }],
+      [JSON.stringify([{ name: 'bleach', average_score: 68 }]), { status: 200 }],
+      [JSON.stringify([{ name: 'one piece', average_score: 80 }]), { status: 200 }],
+      [JSON.stringify([{ name: 'shingeki', average_score: 91 }]), { status: 200 }]
+    );
 
     const expectedActions = [
       {
-        type: 'FETCH_ANIMELIST_REQUEST'
+        type: 'FETCH_ANIMELIST_REQUEST',
       },
       {
         type: 'SET_YEAR',
@@ -486,21 +483,21 @@ describe('getYear action creator', () => {
             { name: 'naruto', average_score: 7.9 },
             { name: 'bleach', average_score: 6.8 },
             { name: 'one piece', average_score: 8 },
-            { name: 'shingeki', average_score: 9.1 }
+            { name: 'shingeki', average_score: 9.1 },
           ],
-          year: 2016
-        }
+          year: 2016,
+        },
       },
       {
-        type: 'FETCH_ANIMELIST_COMPLETE'
-      }
-    ]
+        type: 'FETCH_ANIMELIST_COMPLETE',
+      },
+    ];
     const store = mockStore({
       config: {
-        token: { access_token: 'wtw45CmyEuh4P621IDVxWkgVr5QwTg3wXEc4Z7Cv' }
+        token: { access_token: 'wtw45CmyEuh4P621IDVxWkgVr5QwTg3wXEc4Z7Cv' },
       },
-      years: []
-    })
+      years: [],
+    });
 
     return (
       store
@@ -508,16 +505,17 @@ describe('getYear action creator', () => {
         //This calls fetch 4 times, once for each season
         .then(() => {
           // return of async actions
-          expect(store.getActions()).toEqual(expectedActions)
+          expect(store.getActions()).toEqual(expectedActions);
         })
-    )
-  })
-})
+    );
+  });
+});
 ```
 
 ### Reset mocks between tests with `fetch.resetMocks`
 
-`fetch.resetMocks` resets the `fetch` mock to give fresh mock data in between tests. It only resets the `fetch` calls as to not disturb any other mocked functionality.
+`fetch.resetMocks` resets the `fetch` mock to give fresh mock data in between tests. It only resets the `fetch` calls as
+to not disturb any other mocked functionality.
 
 ```js
 describe('getYear action creator', () => {
@@ -615,114 +613,126 @@ describe('getYear action creator', () => {
 
 ### Using `fetch.mock` to inspect the mock state of each fetch call
 
-`fetch.mock` by default uses [Jest's mocking functions](https://facebook.github.io/jest/docs/en/mock-functions.html#mock-property). Therefore you can make assertions on the mock state. In this example we have an arbitrary function that makes a different fetch request based on the argument you pass to it. In our test, we run Jest's `beforeEach()` and make sure to reset our mock before each `it()` block as we will make assertions on the arguments we are passing to `fetch()`. The most uses property is the `fetch.mock.calls` array. It can give you information on each call, and their arguments which you can use for your `expect()` calls. Jest also comes with some nice aliases for the most used ones.
+`fetch.mock` by default uses [Vitest's mocking functions](https://vitest.dev/api/#mockinstance-properties). Therefore
+you can make assertions on the mock state. In this example we have an arbitrary function that makes a different fetch
+request based on the argument you pass to it. In our test, we run Vitest's `beforeEach()` and make sure to reset our
+mock before each `it()` block as we will make assertions on the arguments we are passing to `fetch()`. The most uses
+property is the `fetch.mock.calls` array. It can give you information on each call, and their arguments which you can
+use for your `expect()` calls. Vitest also comes with some nice aliases for the most used ones.
 
 ```js
 // api.js
 
-import 'cross-fetch'
+import 'cross-fetch';
 
 export function APIRequest(who) {
   if (who === 'facebook') {
-    return fetch('https://facebook.com')
+    return fetch('https://facebook.com');
   } else if (who === 'twitter') {
-    return fetch('https://twitter.com')
+    return fetch('https://twitter.com');
   } else {
-    return fetch('https://google.com')
+    return fetch('https://google.com');
   }
 }
 ```
 
 ```js
 // api.test.js
-import { APIRequest } from './api'
+import { APIRequest } from './api';
 
 describe('testing api', () => {
   beforeEach(() => {
-    fetch.resetMocks()
-  })
+    fetch.resetMocks();
+  });
 
   it('calls google by default', () => {
-    fetch.mockResponse(JSON.stringify({ secret_data: '12345' }))
-    APIRequest()
+    fetch.mockResponse(JSON.stringify({ secret_data: '12345' }));
+    APIRequest();
 
-    expect(fetch.mock.calls.length).toEqual(1)
-    expect(fetch.mock.calls[0][0]).toEqual('https://google.com')
-  })
+    expect(fetch.mock.calls.length).toEqual(1);
+    expect(fetch.mock.calls[0][0]).toEqual('https://google.com');
+  });
 
   it('calls facebook', () => {
-    fetch.mockResponse(JSON.stringify({ secret_data: '12345' }))
-    APIRequest('facebook')
+    fetch.mockResponse(JSON.stringify({ secret_data: '12345' }));
+    APIRequest('facebook');
 
-    expect(fetch.mock.calls.length).toEqual(2)
-    expect(fetch.mock.calls[0][0]).toEqual(
-      'https://facebook.com/someOtherResource'
-    )
-    expect(fetch.mock.calls[1][0]).toEqual('https://facebook.com')
-  })
+    expect(fetch.mock.calls.length).toEqual(2);
+    expect(fetch.mock.calls[0][0]).toEqual('https://facebook.com/someOtherResource');
+    expect(fetch.mock.calls[1][0]).toEqual('https://facebook.com');
+  });
 
   it('calls twitter', () => {
-    fetch.mockResponse(JSON.stringify({ secret_data: '12345' }))
-    APIRequest('twitter')
+    fetch.mockResponse(JSON.stringify({ secret_data: '12345' }));
+    APIRequest('twitter');
 
-    expect(fetch).toBeCalled() // alias for expect(fetch.mock.calls.length).toEqual(1);
-    expect(fetch).toBeCalledWith('https://twitter.com') // alias for expect(fetch.mock.calls[0][0]).toEqual();
-  })
-})
+    expect(fetch).toBeCalled(); // alias for expect(fetch.mock.calls.length).toEqual(1);
+    expect(fetch).toBeCalledWith('https://twitter.com'); // alias for expect(fetch.mock.calls[0][0]).toEqual();
+  });
+});
 ```
 
 ### Using functions to mock slow servers
 
-By default you will want to have your fetch mock return immediately. However if you have some custom logic that needs to tests for slower servers, you can do this by passing it a function and returning a promise when your function resolves
+By default you will want to have your fetch mock return immediately. However if you have some custom logic that needs to
+tests for slower servers, you can do this by passing it a function and returning a promise when your function resolves
 
 ```js
 // api.test.js
-import { request } from './api'
+import { request } from './api';
 
 describe('testing timeouts', () => {
   it('resolves with function and timeout', async () => {
-    fetch.mockResponseOnce(
-      () =>
-        new Promise(resolve => setTimeout(() => resolve({ body: 'ok' }), 100))
-    )
+    fetch.mockResponseOnce(() => new Promise((resolve) => setTimeout(() => resolve({ body: 'ok' }), 100)));
     try {
-      const response = await request()
-      expect(response).toEqual('ok')
+      const response = await request();
+      expect(response).toEqual('ok');
     } catch (e) {
-      throw e
+      throw e;
     }
-  })
-})
+  });
+});
 ```
 
 ### Conditional Mocking
 
-In some test scenarios, you may want to temporarily disable (or enable) mocking for all requests or the next (or a certain number of) request(s).
-You may want to only mock fetch requests to some URLs that match a given request path while in others you may want to mock
-all requests except those matching a given request path. You may even want to conditionally mock based on request headers.
+In some test scenarios, you may want to temporarily disable (or enable) mocking for all requests or the next (or a
+certain number of) request(s). You may want to only mock fetch requests to some URLs that match a given request path
+while in others you may want to mock all requests except those matching a given request path. You may even want to
+conditionally mock based on request headers.
 
-The conditional mock functions cause `jest-fetch-mock` to pass fetches through to the concrete fetch implementation conditionally.
-Calling `fetch.dontMock`, `fetch.doMock`, `fetch.doMockIf` or `fetch.dontMockIf` overrides the default behavior
-of mocking/not mocking all requests. `fetch.dontMockOnce`, `fetch.doMockOnce`, `fetch.doMockOnceIf` and `fetch.dontMockOnceIf` only overrides the behavior
-for the next call to `fetch`, then returns to the default behavior (either mocking all requests or mocking the requests based on the last call to
-`fetch.dontMock`, `fetch.doMock`, `fetch.doMockIf` and `fetch.dontMockIf`).
+The conditional mock functions cause `vitest-fetch-mock` to pass fetches through to the concrete fetch implementation
+conditionally. Calling `fetch.dontMock`, `fetch.doMock`, `fetch.doMockIf` or `fetch.dontMockIf` overrides the default
+behavior of mocking/not mocking all requests. `fetch.dontMockOnce`, `fetch.doMockOnce`, `fetch.doMockOnceIf` and
+`fetch.dontMockOnceIf` only overrides the behavior for the next call to `fetch`, then returns to the default behavior
+(either mocking all requests or mocking the requests based on the last call to `fetch.dontMock`, `fetch.doMock`,
+`fetch.doMockIf` and `fetch.dontMockIf`).
 
-Calling `fetch.resetMocks()` will return to the default behavior of mocking all fetches with a text response of empty string.
+Calling `fetch.resetMocks()` will return to the default behavior of mocking all fetches with a text response of empty
+string.
 
-- `fetch.dontMock()` - Change the default behavior to not mock any fetches until `fetch.resetMocks()` or `fetch.doMock()` is called
-- `fetch.doMock(bodyOrFunction?, responseInit?)` - Reverses `fetch.dontMock()`. This is the default state after `fetch.resetMocks()`
-- `fetch.dontMockOnce()` - For the next fetch, do not mock then return to the default behavior for subsequent fetches. Can be chained.
-- `fetch.doMockOnce(bodyOrFunction?, responseInit?)` or `fetch.mockOnce` - For the next fetch, mock the response then return to the default behavior for subsequent fetches. Can be chained.
-- `fetch.doMockIf(urlOrPredicate, bodyOrFunction?, responseInit?):fetch` or `fetch.mockIf` - causes all fetches to be not be mocked unless they match the given string/RegExp/predicate
-  (i.e. "only mock 'fetch' if the request is for the given URL otherwise, use the real fetch implementation")
-- `fetch.dontMockIf(urlOrPredicate, bodyOrFunction?, responseInit?):fetch` - causes all fetches to be mocked unless they match the given string/RegExp/predicate
-  (i.e. "don't mock 'fetch' if the request is for the given URL, otherwise mock the request")
-- `fetch.doMockOnceIf(urlOrPredicate, bodyOrFunction?, responseInit?):fetch` or `fetch.mockOnceIf` - causes the next fetch to be mocked if it matches the given string/RegExp/predicate. Can be chained.
-  (i.e. "only mock 'fetch' if the next request is for the given URL otherwise, use the default behavior")
-- `fetch.dontMockOnceIf(urlOrPredicate):fetch` - causes the next fetch to be not be mocked if it matches the given string/RegExp/predicate. Can be chained.
-  (i.e. "don't mock 'fetch' if the next request is for the given URL, otherwise use the default behavior")
-- `fetch.isMocking(input, init):boolean` - test utility function to see if the given url/request would be mocked.
-  This is not a read only operation and any "MockOnce" will evaluate (and return to the default behavior)
+- `fetch.dontMock()` - Change the default behavior to not mock any fetches until `fetch.resetMocks()` or
+  `fetch.doMock()` is called
+- `fetch.doMock(bodyOrFunction?, responseInit?)` - Reverses `fetch.dontMock()`. This is the default state after
+  `fetch.resetMocks()`
+- `fetch.dontMockOnce()` - For the next fetch, do not mock then return to the default behavior for subsequent fetches.
+  Can be chained.
+- `fetch.doMockOnce(bodyOrFunction?, responseInit?)` or `fetch.mockOnce` - For the next fetch, mock the response then
+  return to the default behavior for subsequent fetches. Can be chained.
+- `fetch.doMockIf(urlOrPredicate, bodyOrFunction?, responseInit?):fetch` or `fetch.mockIf` - causes all fetches to be
+  not be mocked unless they match the given string/RegExp/predicate (i.e. "only mock 'fetch' if the request is for the
+  given URL otherwise, use the real fetch implementation")
+- `fetch.dontMockIf(urlOrPredicate, bodyOrFunction?, responseInit?):fetch` - causes all fetches to be mocked unless they
+  match the given string/RegExp/predicate (i.e. "don't mock 'fetch' if the request is for the given URL, otherwise mock
+  the request")
+- `fetch.doMockOnceIf(urlOrPredicate, bodyOrFunction?, responseInit?):fetch` or `fetch.mockOnceIf` - causes the next
+  fetch to be mocked if it matches the given string/RegExp/predicate. Can be chained. (i.e. "only mock 'fetch' if the
+  next request is for the given URL otherwise, use the default behavior")
+- `fetch.dontMockOnceIf(urlOrPredicate):fetch` - causes the next fetch to be not be mocked if it matches the given
+  string/RegExp/predicate. Can be chained. (i.e. "don't mock 'fetch' if the next request is for the given URL, otherwise
+  use the default behavior")
+- `fetch.isMocking(input, init):boolean` - test utility function to see if the given url/request would be mocked. This
+  is not a read only operation and any "MockOnce" will evaluate (and return to the default behavior)
 
 For convenience, all the conditional mocking functions also accept optional parameters after the 1st parameter that call
 `mockResponse` or `mockResponseOnce` respectively. This allows you to conditionally mock a response in a single call.
@@ -730,6 +740,20 @@ For convenience, all the conditional mocking functions also accept optional para
 #### Conditional Mocking examples
 
 ```js
+import crossFetch from 'cross-fetch';
+
+vi.mock('cross-fetch', async () => {
+  const crossFetchActual = await requireActual('cross-fetch');
+  const mocked = {};
+  for (const key of Object.keys(crossFetchActual)) {
+    if (typeof crossFetchActual[key] === 'function') {
+      mocked[key] = vi.fn(crossFetchActual[key]);
+    } else {
+      mocked[key] = crossFetchActual[key];
+    }
+  }
+  return mocked;
+})
 
 describe('conditional mocking', () => {
   const realResponse = 'REAL FETCH RESPONSE'
@@ -739,15 +763,14 @@ describe('conditional mocking', () => {
   beforeEach(() => {
     fetch.resetMocks()
     fetch.mockResponse(mockedDefaultResponse)
-    crossFetchSpy = jest
-      .spyOn(require('cross-fetch'), 'fetch')
+    vi.mocked(crossFetch)
       .mockImplementation(async () =>
         Promise.resolve(new Response(realResponse))
       )
   })
 
   afterEach(() => {
-    crossFetchSpy.mockRestore()
+    vi.mocked(crossFetch).mockRestore()
   })
 
   const expectMocked = async (uri, response = mockedDefaultResponse) => {
@@ -949,49 +972,56 @@ describe('conditional mocking', () => {
 ```
 
 ```js
+import crossFetch from 'cross-fetch';
+
+vi.mock('cross-fetch', async () => {
+  const crossFetchActual = await requireActual('cross-fetch');
+  const mocked = {};
+  for (const key of Object.keys(crossFetchActual)) {
+    if (typeof crossFetchActual[key] === 'function') {
+      mocked[key] = vi.fn(crossFetchActual[key]);
+    } else {
+      mocked[key] = crossFetchActual[key];
+    }
+  }
+  return mocked;
+});
+
 const expectMocked = async (uri, response = mockedDefaultResponse) => {
-  return expect(request(uri)).resolves.toEqual(response)
-}
-const expectUnmocked = async uri => {
-  return expect(request(uri)).resolves.toEqual(realResponse)
-}
+  return expect(request(uri)).resolves.toEqual(response);
+};
+const expectUnmocked = async (uri) => {
+  return expect(request(uri)).resolves.toEqual(realResponse);
+};
 
 describe('conditional mocking complex', () => {
-  const realResponse = 'REAL FETCH RESPONSE'
-  const mockedDefaultResponse = 'MOCKED DEFAULT RESPONSE'
-  const testUrl = defaultRequestUri
-  let crossFetchSpy
+  const realResponse = 'REAL FETCH RESPONSE';
+  const mockedDefaultResponse = 'MOCKED DEFAULT RESPONSE';
+  const testUrl = defaultRequestUri;
+  let crossFetchSpy;
   beforeEach(() => {
-    fetch.resetMocks()
-    fetch.mockResponse(mockedDefaultResponse)
-    crossFetchSpy = jest
-      .spyOn(require('cross-fetch'), 'fetch')
-      .mockImplementation(async () =>
-        Promise.resolve(new Response(realResponse))
-      )
-  })
+    fetch.resetMocks();
+    fetch.mockResponse(mockedDefaultResponse);
+    vi.mocked(crossFetch).mockImplementation(async () => Promise.resolve(new Response(realResponse)));
+  });
 
   afterEach(() => {
-    crossFetchSpy.mockRestore()
-  })
+    vi.mocked(crossFetch).mockRestore();
+  });
 
   describe('complex example', () => {
-    const alternativeUrl = 'http://bar'
-    const alternativeBody = 'ALTERNATIVE RESPONSE'
+    const alternativeUrl = 'http://bar';
+    const alternativeBody = 'ALTERNATIVE RESPONSE';
     beforeEach(() => {
       fetch
         // .mockResponse(mockedDefaultResponse) // set above - here for clarity
         .mockResponseOnce('1') // 1
         .mockResponseOnce('2') // 2
-        .mockResponseOnce(async uri =>
-          uri === alternativeUrl ? alternativeBody : '3'
-        ) // 3
+        .mockResponseOnce(async (uri) => (uri === alternativeUrl ? alternativeBody : '3')) // 3
         .mockResponseOnce('4') // 4
         .mockResponseOnce('5') // 5
-        .mockResponseOnce(async uri =>
-          uri === alternativeUrl ? alternativeBody : mockedDefaultResponse
-        ) // 6
-    })
+        .mockResponseOnce(async (uri) => (uri === alternativeUrl ? alternativeBody : mockedDefaultResponse)); // 6
+    });
 
     describe('default (`doMock`)', () => {
       beforeEach(() => {
@@ -1000,68 +1030,63 @@ describe('conditional mocking complex', () => {
           .dontMockOnceIf(alternativeUrl)
           .doMockOnceIf(alternativeUrl)
           .doMockOnce()
-          .dontMockOnce()
-      })
+          .dontMockOnce();
+      });
 
       test('defaultRequestUri', async () => {
-        await expectMocked(defaultRequestUri, '1') // 1
-        await expectUnmocked(defaultRequestUri) // 2
-        await expectMocked(defaultRequestUri, '3') // 3
-        await expectUnmocked(defaultRequestUri) // 4
+        await expectMocked(defaultRequestUri, '1'); // 1
+        await expectUnmocked(defaultRequestUri); // 2
+        await expectMocked(defaultRequestUri, '3'); // 3
+        await expectUnmocked(defaultRequestUri); // 4
         // after .once('..')
-        await expectMocked(defaultRequestUri, '5') // 5
-        await expectMocked(defaultRequestUri, mockedDefaultResponse) // 6
+        await expectMocked(defaultRequestUri, '5'); // 5
+        await expectMocked(defaultRequestUri, mockedDefaultResponse); // 6
         // default 'isMocked' (not 'Once')
-        await expectMocked(defaultRequestUri, mockedDefaultResponse) // 7
-      })
+        await expectMocked(defaultRequestUri, mockedDefaultResponse); // 7
+      });
 
       test('alternativeUrl', async () => {
-        await expectUnmocked(alternativeUrl) // 1
-        await expectMocked(alternativeUrl, '2') // 2
-        await expectMocked(alternativeUrl, alternativeBody) // 3
-        await expectUnmocked(alternativeUrl) // 4
+        await expectUnmocked(alternativeUrl); // 1
+        await expectMocked(alternativeUrl, '2'); // 2
+        await expectMocked(alternativeUrl, alternativeBody); // 3
+        await expectUnmocked(alternativeUrl); // 4
         // after .once('..')
-        await expectMocked(alternativeUrl, '5') // 5
-        await expectMocked(alternativeUrl, alternativeBody) // 6
+        await expectMocked(alternativeUrl, '5'); // 5
+        await expectMocked(alternativeUrl, alternativeBody); // 6
         // default 'isMocked' (not 'Once')
-        await expectMocked(alternativeUrl, mockedDefaultResponse) // 7
-      })
-    })
+        await expectMocked(alternativeUrl, mockedDefaultResponse); // 7
+      });
+    });
 
     describe('dontMock', () => {
       beforeEach(() => {
-        fetch
-          .dontMock()
-          .dontMockOnceIf(alternativeUrl)
-          .doMockOnceIf(alternativeUrl)
-          .doMockOnce()
-          .dontMockOnce()
-      })
+        fetch.dontMock().dontMockOnceIf(alternativeUrl).doMockOnceIf(alternativeUrl).doMockOnce().dontMockOnce();
+      });
 
       test('defaultRequestUri', async () => {
-        await expectMocked(defaultRequestUri, '1') // 1
-        await expectUnmocked(defaultRequestUri) // 2
-        await expectMocked(defaultRequestUri, '3') // 3
-        await expectUnmocked(defaultRequestUri) // 4
+        await expectMocked(defaultRequestUri, '1'); // 1
+        await expectUnmocked(defaultRequestUri); // 2
+        await expectMocked(defaultRequestUri, '3'); // 3
+        await expectUnmocked(defaultRequestUri); // 4
         // after .once('..')
-        await expectUnmocked(defaultRequestUri) // 5
-        await expectUnmocked(defaultRequestUri) // 6
+        await expectUnmocked(defaultRequestUri); // 5
+        await expectUnmocked(defaultRequestUri); // 6
         // default 'isMocked' (not 'Once')
-        await expectUnmocked(defaultRequestUri) // 7
-      })
+        await expectUnmocked(defaultRequestUri); // 7
+      });
 
       test('alternativeUrl', async () => {
-        await expectUnmocked(alternativeUrl) // 1
-        await expectMocked(alternativeUrl, '2') // 2
-        await expectMocked(alternativeUrl, alternativeBody) // 3
-        await expectUnmocked(alternativeUrl) // 4
+        await expectUnmocked(alternativeUrl); // 1
+        await expectMocked(alternativeUrl, '2'); // 2
+        await expectMocked(alternativeUrl, alternativeBody); // 3
+        await expectUnmocked(alternativeUrl); // 4
         // after .once('..')
-        await expectUnmocked(alternativeUrl) // 5
-        await expectUnmocked(alternativeUrl) // 6
+        await expectUnmocked(alternativeUrl); // 5
+        await expectUnmocked(alternativeUrl); // 6
         // default 'isMocked' (not 'Once')
-        await expectUnmocked(alternativeUrl) // 7
-      })
-    })
+        await expectUnmocked(alternativeUrl); // 7
+      });
+    });
 
     describe('doMockIf(alternativeUrl)', () => {
       beforeEach(() => {
@@ -1070,33 +1095,33 @@ describe('conditional mocking complex', () => {
           .dontMockOnceIf(alternativeUrl)
           .doMockOnceIf(alternativeUrl)
           .doMockOnce()
-          .dontMockOnce()
-      })
+          .dontMockOnce();
+      });
 
       test('defaultRequestUri', async () => {
-        await expectMocked(defaultRequestUri, '1') // 1
-        await expectUnmocked(defaultRequestUri) // 2
-        await expectMocked(defaultRequestUri, '3') // 3
-        await expectUnmocked(defaultRequestUri) // 4
+        await expectMocked(defaultRequestUri, '1'); // 1
+        await expectUnmocked(defaultRequestUri); // 2
+        await expectMocked(defaultRequestUri, '3'); // 3
+        await expectUnmocked(defaultRequestUri); // 4
         // after .once('..')
-        await expectUnmocked(defaultRequestUri) // 5
-        await expectUnmocked(defaultRequestUri) // 6
+        await expectUnmocked(defaultRequestUri); // 5
+        await expectUnmocked(defaultRequestUri); // 6
         // default 'isMocked' (not 'Once')
-        await expectUnmocked(defaultRequestUri) // 7
-      })
+        await expectUnmocked(defaultRequestUri); // 7
+      });
 
       test('alternativeUrl', async () => {
-        await expectUnmocked(alternativeUrl) // 1
-        await expectMocked(alternativeUrl, '2') // 2
-        await expectMocked(alternativeUrl, alternativeBody) // 3
-        await expectUnmocked(alternativeUrl) // 4
+        await expectUnmocked(alternativeUrl); // 1
+        await expectMocked(alternativeUrl, '2'); // 2
+        await expectMocked(alternativeUrl, alternativeBody); // 3
+        await expectUnmocked(alternativeUrl); // 4
         // after .once('..')
-        await expectMocked(alternativeUrl, '5') // 5
-        await expectMocked(alternativeUrl, alternativeBody) // 6
+        await expectMocked(alternativeUrl, '5'); // 5
+        await expectMocked(alternativeUrl, alternativeBody); // 6
         // default 'isMocked' (not 'Once')
-        await expectMocked(alternativeUrl, mockedDefaultResponse) // 7
-      })
-    })
+        await expectMocked(alternativeUrl, mockedDefaultResponse); // 7
+      });
+    });
 
     describe('dontMockIf(alternativeUrl)', () => {
       beforeEach(() => {
@@ -1105,33 +1130,33 @@ describe('conditional mocking complex', () => {
           .dontMockOnceIf(alternativeUrl)
           .doMockOnceIf(alternativeUrl)
           .doMockOnce()
-          .dontMockOnce()
-      })
+          .dontMockOnce();
+      });
 
       test('defaultRequestUri', async () => {
-        await expectMocked(defaultRequestUri, '1') // 1
-        await expectUnmocked(defaultRequestUri) // 2
-        await expectMocked(defaultRequestUri, '3') // 3
-        await expectUnmocked(defaultRequestUri) // 4
+        await expectMocked(defaultRequestUri, '1'); // 1
+        await expectUnmocked(defaultRequestUri); // 2
+        await expectMocked(defaultRequestUri, '3'); // 3
+        await expectUnmocked(defaultRequestUri); // 4
         // after .once('..')
-        await expectMocked(defaultRequestUri, '5') // 5
-        await expectMocked(defaultRequestUri, mockedDefaultResponse) // 6
+        await expectMocked(defaultRequestUri, '5'); // 5
+        await expectMocked(defaultRequestUri, mockedDefaultResponse); // 6
         // default 'isMocked' (not 'Once')
-        await expectMocked(defaultRequestUri, mockedDefaultResponse) // 7
-      })
+        await expectMocked(defaultRequestUri, mockedDefaultResponse); // 7
+      });
 
       test('alternativeUrl', async () => {
-        await expectUnmocked(alternativeUrl) // 1
-        await expectMocked(alternativeUrl, '2') // 2
-        await expectMocked(alternativeUrl, alternativeBody) // 3
-        await expectUnmocked(alternativeUrl) // 4
+        await expectUnmocked(alternativeUrl); // 1
+        await expectMocked(alternativeUrl, '2'); // 2
+        await expectMocked(alternativeUrl, alternativeBody); // 3
+        await expectUnmocked(alternativeUrl); // 4
         // after .once('..')
-        await expectUnmocked(alternativeUrl) // 5
-        await expectUnmocked(alternativeUrl) // 6
+        await expectUnmocked(alternativeUrl); // 5
+        await expectUnmocked(alternativeUrl); // 6
         // default 'isMocked' (not 'Once')
-        await expectUnmocked(alternativeUrl) // 7
-      })
-    })
-  })
-})
+        await expectUnmocked(alternativeUrl); // 7
+      });
+    });
+  });
+});
 ```

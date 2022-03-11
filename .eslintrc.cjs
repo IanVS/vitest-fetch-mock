@@ -7,7 +7,11 @@ module.exports = {
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 6,
+    tsconfigRootDir: __dirname,
+    project: './tsconfig.eslint.json',
+    // Because we are setting "type": "module" in our package.json, all `.js` files are treated as modules
+    // Sometimes we will want a commonjs file, like this eslint config, in which case we use the .cjs extension
+    extraFileExtensions: ['.cjs'],
   },
   plugins: ['@typescript-eslint'],
   rules: {
@@ -17,4 +21,4 @@ module.exports = {
     'no-global-assign': 0,
     'no-undef': 0,
   },
-}
+};

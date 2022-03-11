@@ -1,70 +1,59 @@
 {
-  "name": "jest-fetch-mock",
-  "version": "3.0.3",
-  "description": "fetch mock for jest",
+  "name": "vitest-fetch-mock",
+  "version": "0.1.0",
+  "description": "fetch mock for vitest",
+  "type": "module",
   "main": "src/index.js",
+  "module": "src/index.js",
   "types": "types",
   "scripts": {
-    "test": "jest && yarn tsc && yarn lint",
+    "test": "vitest run && npm run tsc && npm run lint",
     "lint": "eslint .",
     "tsc": "tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jefflau/jest-fetch-mock.git"
+    "url": "git+https://github.com/IanVS/vitest-fetch-mock.git"
   },
   "keywords": [
-    "jest",
+    "vitest",
     "mock",
     "fetch"
   ],
-  "author": "Jeff Lau <jeff-lau@live.com> (http://jefflau.net/)",
+  "author": {
+    "name": "Ian VanSchooten",
+    "email": "ian.vanschooten@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Jeff Lau",
+      "email": "jeff-lau@live.com",
+      "url": "http://jefflau.net/"
+    }
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jefflau/jest-fetch-mock/issues"
+    "url": "https://github.com/IanVS/vitest-fetch-mock/issues"
   },
-  "homepage": "https://github.com/jefflau/jest-fetch-mock#readme",
+  "homepage": "https://github.com/IanVS/vitest-fetch-mock#readme",
+  "engines": {
+    "node": ">=14.14.0"
+  },
   "dependencies": {
-    "cross-fetch": "^3.0.6",
-    "domexception": "^2.0.1",
-    "promise-polyfill": "^8.1.3"
+    "cross-fetch": "^3.0.6"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.14",
     "@types/node": "^10.17.40",
-    "@typescript-eslint/eslint-plugin": "^4.5.0",
-    "@typescript-eslint/parser": "^4.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
     "eslint": "^7.11.0",
-    "jest": "^26.6.0",
+    "jsdom": "^19.0.0",
     "prettier": "^2.1.2",
     "regenerator-runtime": "^0.13.7",
-    "typescript": "^4.0.3"
+    "typescript": "^4.6.2",
+    "vitest": "^0.6.0"
   },
-  "prettier": {
-    "semi": false,
-    "arrowParens": "always",
-    "editor.formatOnSave": true,
-    "singleQuote": true,
-    "trailingComma": "es5",
-    "overrides": [
-      {
-        "files": "**/*.ts",
-        "options": {
-          "semi": true,
-          "tabWidth": 4,
-          "singleQuote": false,
-          "printWidth": 125
-        }
-      }
-    ]
-  },
-  "jest": {
-    "automock": false,
-    "testPathIgnorePatterns": [
-      "types"
-    ],
-    "setupFiles": [
-      "./setupJest.js"
-    ]
+  "peerDependencies": {
+    "vitest": "*"
   }
 }

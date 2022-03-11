@@ -1,12 +1,18 @@
 {
-  "extends": "./types/tsconfig.json",
   "compilerOptions": {
+    "module": "es2020",
+    "moduleResolution": "node",
+    "lib": ["es2015", "dom"],
     "baseUrl": ".",
-    "rootDir": "./types",
     "paths": {
-      "jest-fetch-mock": [
-        "./"
-      ]
-    }
+      "vitest-fetch-mock": ["."]
+    },
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
   }
 }

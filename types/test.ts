@@ -1,4 +1,7 @@
-import fm, { enableFetchMocks, disableFetchMocks, MockResponseInit } from 'jest-fetch-mock';
+import setupFm, { MockResponseInit } from 'vitest-fetch-mock';
+import {vi} from 'vitest';
+
+const fm = setupFm(vi);
 
 fetchMock.mockResponse(JSON.stringify({foo: "bar"}));
 fetchMock.mockResponse(JSON.stringify({foo: "bar"}), {
@@ -105,8 +108,6 @@ function someSyncStringHandler(): string {
     return JSON.stringify({foo: "bar"});
 }
 
-enableFetchMocks();
-disableFetchMocks();
 fm.enableMocks();
 fm.disableMocks();
 fm.doMock();
