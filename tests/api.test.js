@@ -179,7 +179,7 @@ describe('request', () => {
     });
   });
 
-  it('returns object when response is json', (done) => {
+  it('returns object when response is json', async () => {
     const mockResponse = {
       results: [{ gender: 'neutral' }],
       info: { seed: '0123456789123456', results: 1, page: 1, version: '1.2' },
@@ -190,25 +190,17 @@ describe('request', () => {
       },
     });
 
-    request()
-      .then((response) => {
-        expect(fetch).toHaveBeenCalledWith('https://randomuser.me/api', {});
-        expect(response).toEqual(mockResponse);
-        done();
-      })
-      .catch(done.fail);
+    const response = await request();
+    expect(fetch).toHaveBeenCalledWith('https://randomuser.me/api', {});
+    expect(response).toEqual(mockResponse);
   });
 
-  it('returns text when response is text', (done) => {
+  it('returns text when response is text', async () => {
     fetch.mockResponseOnce('ok');
 
-    request()
-      .then((response) => {
-        expect(fetch).toHaveBeenCalledWith('https://randomuser.me/api', {});
-        expect(response).toEqual('ok');
-        done();
-      })
-      .catch(done.fail);
+    const response = await request();
+    expect(fetch).toHaveBeenCalledWith('https://randomuser.me/api', {});
+    expect(response).toEqual('ok');
   });
 
   it('returns blob when response is text/csv', async () => {
@@ -229,18 +221,18 @@ describe('request', () => {
     expect(fetch).toHaveBeenCalledWith('https://randomuser.me/api', {});
   });
 
-  it('rejects with error data', (done) => {
+  it('rejects with error data', async () => {
     const errorData = {
       error: 'Uh oh, something has gone wrong. Please tweet us @randomapi about the issue. Thank you.',
     };
     fetch.mockRejectOnce(JSON.stringify(errorData));
 
-    request()
-      .then(done.fail)
-      .catch((error) => {
-        expect(error.message).toBe(errorData.error);
-        done();
-      });
+    try {
+      const _response = await request();
+      throw Error('Should have rejected with error data');
+    } catch (error) {
+      expect(error.message).toBe(errorData.error);
+    }
   });
 
   it('resolves with function', async () => {
