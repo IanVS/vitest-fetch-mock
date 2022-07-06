@@ -58,6 +58,6 @@
     "vitest": "^0.17.0"
   },
   "peerDependencies": {
-    "vitest": "*"
+    "vitest": "^0.16.0"
   }
 }
