@@ -1,7 +1,7 @@
 // TypeScript Version: 3.0
 import Global = NodeJS.Global;
 import { vitest } from 'vitest';
-import type { SpyInstanceFn } from 'vitest';
+import type { Mock } from 'vitest';
 
 declare global {
   const fetchMock: FetchMock;
@@ -18,7 +18,7 @@ export interface GlobalWithFetchMock extends Global {
 }
 
 export interface FetchMock
-  extends SpyInstanceFn<[string | Request | undefined, RequestInit | undefined], Promise<Response>> {
+  extends Mock<[string | Request | undefined, RequestInit | undefined], Promise<Response>> {
   (input: string | Request, init?: RequestInit): Promise<Response>;
 
   // Response mocking
