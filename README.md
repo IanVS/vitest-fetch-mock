@@ -51,10 +51,10 @@ Create a `setupVitest` file to setup the mock or add this to an existing `setupF
 import createFetchMock from 'vitest-fetch-mock';
 import { vi } from 'vitest';
 
-const fetchMock = createFetchMock(vi);
+const fetchMocker = createFetchMock(vi);
 
 // sets globalThis.fetch and globalThis.fetchMock to our mocked version
-fetchMock.enableMocks();
+fetchMocker.enableMocks();
 ```
 
 Add the setup file to your vitest [config](https://vitest.dev/config/#setupfiles):
@@ -78,13 +78,13 @@ the `...enableMocks()` line in `setupVitest.js`:
 ```js
 import createFetchMock from 'vitest-fetch-mock';
 import { vi } from 'vitest';
-const fetchMock = createFetchMock(vi);
+const fetchMocker = createFetchMock(vi);
 
 // adds the 'fetchMock' global variable and rewires 'fetch' global to call 'fetchMock' instead of the real implementation
-fetchMock.enableMocks();
+fetchMocker.enableMocks();
 
 // changes default behavior of fetchMock to use the real 'fetch' implementation and not mock responses
-fetchMock.dontMock();
+fetchMocker.dontMock();
 ```
 
 If you want a single test file to return to the default behavior of mocking all responses, add the following to the test
@@ -93,7 +93,7 @@ file:
 ```js
 beforeEach(() => {
   // if you have an existing `beforeEach` just add the following line to it
-  fetchMock.doMock();
+  fetchMocker.doMock();
 });
 ```
 
@@ -102,7 +102,7 @@ To enable mocking for a specific URL only:
 ```js
 beforeEach(() => {
   // if you have an existing `beforeEach` just add the following lines to it
-  fetchMock.mockIf(/^https?:\/\/example.com.*$/, (req) => {
+  fetchMocker.mockIf(/^https?:\/\/example.com.*$/, (req) => {
     if (req.url.endsWith('/path1')) {
       return 'some response body';
     } else if (req.url.endsWith('/path2')) {
@@ -126,12 +126,12 @@ If you have changed the default behavior to use the real implementation, you can
 be mocked by using the `mockOnce` function:
 
 ```js
-fetchMock.mockOnce('the next call to fetch will always return this as the body');
+fetchMocker.mockOnce('the next call to fetch will always return this as the body');
 ```
 
-This function behaves exactly like `fetchMock.once` but guarantees the next call to `fetch` will be mocked even if the
-default behavior of fetchMock is to use the real implementation. You can safely convert all you `fetchMock.once` calls
-to `fetchMock.mockOnce` without a risk of changing their behavior.
+This function behaves exactly like `fetchMocker.once` but guarantees the next call to `fetch` will be mocked even if the
+default behavior of fetchMock is to use the real implementation. You can safely convert all you `fetchMocker.once` calls
+to `fetchMocker.mockOnce` without a risk of changing their behavior.
 
 ### To setup for an individual test
 
@@ -141,8 +141,8 @@ Add the following line to the start of your test case (before any other imports)
 import createFetchMock from 'vitest-fetch-mock';
 import { vi } from 'vitest';
 
-const fetchMock = createFetchMock(vi);
-fetchMock.enableMocks();
+const fetchMocker = createFetchMock(vi);
+fetchMocker.enableMocks();
 ```
 
 #### TypeScript importing
