@@ -21,47 +21,81 @@ export interface FetchMock
   extends Mock<[string | Request | undefined, RequestInit | undefined], Promise<Response>> {
   (input: string | Request, init?: RequestInit): Promise<Response>;
 
-  // Response mocking
+  /**
+   * Response mocking
+   */ 
   mockResponse(fn: MockResponseInitFunction): FetchMock;
   mockResponse(response: string, responseInit?: MockParams): FetchMock;
 
+  /**
+   * Response mocking
+   */ 
   mockResponseOnce(fn: MockResponseInitFunction): FetchMock;
   mockResponseOnce(response: string, responseInit?: MockParams): FetchMock;
 
-  // alias for mockResponseOnce
+  /**
+   * alias for mockResponseOnce
+   */ 
   once(fn: MockResponseInitFunction): FetchMock;
   once(url: string, responseInit?: MockParams): FetchMock;
 
+  /**
+   * Response mocking for multiple calls
+   */ 
   mockResponses(...responses: Array<string | [string, MockParams] | MockResponseInitFunction>): FetchMock;
 
-  // Error/Reject mocking
+  /**
+   * Error/Reject mocking
+   */ 
   mockReject(error?: ErrorOrFunction): FetchMock;
+  /**
+   * Error/Reject mocking
+   */ 
   mockRejectOnce(error?: ErrorOrFunction): FetchMock;
-
+  /**
+   * Error/Reject mocking
+   */ 
   mockAbort(): FetchMock;
+  /**
+   * Error/Reject mocking
+   */ 
   mockAbortOnce(): FetchMock;
 
-  // Conditional Mocking
+  /**
+   * Conditional Mocking
+   */ 
   isMocking(input: string | Request): boolean;
 
+  /**
+   * Conditional Mocking
+   */ 
   doMock(fn?: MockResponseInitFunction): FetchMock;
   doMock(response: string, responseInit?: MockParams): FetchMock;
 
+  /**
+   * Conditional Mocking
+   */ 
   doMockOnce(fn?: MockResponseInitFunction): FetchMock;
   doMockOnce(response: string, responseInit?: MockParams): FetchMock;
-  // alias for doMockOnce
+  /**
+   * alias for doMockOnce
+   */ 
   mockOnce(fn?: MockResponseInitFunction): FetchMock;
   mockOnce(response: string, responseInit?: MockParams): FetchMock;
 
   doMockIf(urlOrPredicate: UrlOrPredicate, fn?: MockResponseInitFunction): FetchMock;
   doMockIf(urlOrPredicate: UrlOrPredicate, response: string, responseInit?: MockParams): FetchMock;
-  // alias for doMockIf
+  /**
+   * alias for doMockIf
+   */ 
   mockIf(urlOrPredicate: UrlOrPredicate, fn?: MockResponseInitFunction): FetchMock;
   mockIf(urlOrPredicate: UrlOrPredicate, response: string, responseInit?: MockParams): FetchMock;
 
   doMockOnceIf(urlOrPredicate: UrlOrPredicate, fn?: MockResponseInitFunction): FetchMock;
   doMockOnceIf(urlOrPredicate: UrlOrPredicate, response: string, responseInit?: MockParams): FetchMock;
-  // alias for doMocKOnceIf
+  /**
+   * alias for doMocKOnceIf
+   */ 
   mockOnceIf(urlOrPredicate: UrlOrPredicate, fn?: MockResponseInitFunction): FetchMock;
   mockOnceIf(urlOrPredicate: UrlOrPredicate, response: string, responseInit?: MockParams): FetchMock;
 
