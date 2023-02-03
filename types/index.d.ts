@@ -79,6 +79,7 @@ export interface FetchMock
   
   /**
    * Returns all the requests that have been made to the mocked fetch function.
+   * Does not include aborted requests.
    */
   requests(): Request[];
 
