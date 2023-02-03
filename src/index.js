@@ -245,8 +245,8 @@ export default function createFetchMocker(vi) {
       } catch(e) {
         // ignore
       }
-    }
-    );
+    });
+    return requests;
   };
 
   fetch.resetMocks = () => {
