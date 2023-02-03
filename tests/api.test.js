@@ -14,6 +14,8 @@ describe('testing mockResponse and alias once', () => {
     expect(response).toEqual({ secret_data: 'abcde' });
     expect(fetch.mock.calls.length).toEqual(1);
     expect(fetch.mock.calls[0][0]).toEqual('https://google.com');
+    expect(fetch.requests().length).toEqual(1);
+    expect(fetch.requests()[0].url).toEqual('https://google.com/');
   });
 
   it('mocks a response with chaining', async () => {
@@ -53,6 +55,7 @@ describe('testing mockResponse and alias once', () => {
     expect(fetch.mock.calls.length).toEqual(2);
 
     expect(fetch.mock.calls[0][0]).toEqual('https://facebook.com/someOtherResource');
+    expect(fetch.requests()[0].url).toEqual('https://facebook.com/someOtherResource');
     expect(fetch.mock.calls[1][0]).toEqual('https://facebook.com');
   });
 
@@ -64,6 +67,16 @@ describe('testing mockResponse and alias once', () => {
     expect(response).toEqual({ secret_data: 'abcde' });
     expect(fetch.mock.calls.length).toEqual(1);
     expect(fetch.mock.calls[0][0]).toEqual(new URL('https://instagram.com'));
+  });
+
+  it('returns normalized requests', async () => {
+    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }, { status: 200 }));
+
+    const response = await APIRequest('instagram');
+
+    expect(response).toEqual({ secret_data: 'abcde' });
+    expect(fetch.requests().length).toEqual(1);
+    expect(fetch.requests()[0].method).toEqual("GET");
   });
 
   it('supports an object with a stringifier', async () => {
