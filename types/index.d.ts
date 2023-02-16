@@ -110,6 +110,12 @@ export interface FetchMock
 
   dontMockOnceIf(urlOrPredicate: UrlOrPredicate, fn?: MockResponseInitFunction): FetchMock;
   dontMockOnceIf(urlOrPredicate: UrlOrPredicate, response: string, responseInit?: MockParams): FetchMock;
+  
+  /**
+   * Returns all the requests that have been made to the mocked fetch function.
+   * Does not include aborted requests.
+   */
+  requests(): Request[];
 
   resetMocks(): void;
   enableMocks(): void;

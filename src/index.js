@@ -236,6 +236,19 @@ export default function createFetchMocker(vi) {
     return fetch;
   };
 
+  fetch.requests = () => {
+    const requests = [];
+    fetch.mock.calls.forEach((call) => {
+      try {
+        let req = normalizeRequest(call[0], call[1]);
+        requests.push(req);
+      } catch(e) {
+        // ignore
+      }
+    });
+    return requests;
+  };
+
   fetch.resetMocks = () => {
     fetch.mockReset();
     isMocking.mockReset();
