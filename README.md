@@ -617,7 +617,7 @@ describe('getYear action creator', () => {
 you can make assertions on the mock state. In this example we have an arbitrary function that makes a different fetch
 request based on the argument you pass to it. In our test, we run Vitest's `beforeEach()` and make sure to reset our
 mock before each `it()` block as we will make assertions on the arguments we are passing to `fetch()`. Then we use the 
-`fetch.requests()` function to give us a history of all requests (normalized) that were made.  It can give you 
+`fetch.requests()` function to give us a history of all non-aborted requests (normalized) that were made.  It can give you 
 information on each call, and their arguments which you can use for your `expect()` calls. Vitest also comes with some 
 nice aliases for the most used ones.
 
@@ -650,6 +650,7 @@ describe('testing api', () => {
     fetch.mockResponse(JSON.stringify({ secret_data: '12345' }));
     APIRequest();
 
+    // there was one request, which was not aborted
     expect(fetch.requests().length).toEqual(1);
     expect(fetch.requests()[0].url).toEqual('https://google.com/');
   });
