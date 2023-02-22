@@ -19,8 +19,9 @@ supports Node.js and any browser-like runtime.
 ## Contents
 
 - [Usage](#usage)
-  - [Installation and Setup](#package-installation)
-  - [Using with Create-React-App](#using-with-create-react-app)
+  - [Package Installation](#package-installation)
+  - [Setup for all tests](#to-setup-for-all-tests)
+  - [Setup for an individual test](#to-setup-for-an-individual-test)
 - [API](#api)
 - [Examples](#examples)
   - [Simple mock and assert](#simple-mock-and-assert)
