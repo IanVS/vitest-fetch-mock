@@ -1,5 +1,7 @@
 import 'cross-fetch/polyfill';
 
+import crossFetch from 'cross-fetch';
+
 export async function APIRequest(who) {
   if (who === 'facebook') {
     const call1 = fetch('https://facebook.com/someOtherResource').then((res) => res.json());
@@ -49,6 +51,16 @@ export function request(uri = defaultRequestUri) {
       return response;
     })
     .catch((error) => {
+      const errorData = JSON.parse(error);
+      throw new Error(errorData.error);
+    });
+}
+
+export function requestWithImportedCrossFetch(uri = defaultRequestUri) {
+  return crossFetch(uri, {})
+    .then((response) => {
+      return response.text();
+    }).catch((error) => {
       const errorData = JSON.parse(error);
       throw new Error(errorData.error);
     });

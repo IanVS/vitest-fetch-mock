@@ -1,6 +1,7 @@
 import { describe, afterEach, beforeEach, it, test, expect, vi } from 'vitest';
-import { APIRequest, APIRequest2, defaultRequestUri, request } from './api';
-import crossFetch from 'cross-fetch';
+import { APIRequest, APIRequest2, defaultRequestUri, request, requestWithImportedCrossFetch } from './api';
+
+const crossFetch = require('cross-fetch');
 
 describe('testing mockResponse and alias once', () => {
   beforeEach(() => {
@@ -689,6 +690,39 @@ describe('conditional mocking', () => {
         await expectUnmocked(alternativeUrl); // 7
       });
     });
+  });
+});
+
+describe('cross-fetch import', () => {
+  const realResponse = 'REAL FETCH RESPONSE';
+  const mockedDefaultResponse = 'MOCKED DEFAULT RESPONSE';
+
+  const expectMocked = async (uri, response = mockedDefaultResponse) => {
+    return expect(requestWithImportedCrossFetch(uri)).resolves.toEqual(response);
+  };
+  const expectUnmocked = async (uri) => {
+    return expect(requestWithImportedCrossFetch(uri)).resolves.toEqual(realResponse);
+  };
+
+  it('enable and disable import', async ()=> {
+    const createMocker = (await import('../src/index')).default;
+    const fetchMock = createMocker(vi);
+
+    fetchMock.enableMocks();
+
+    const otherResponse = 'other response';
+    fetchMock.once(otherResponse);
+    
+    await expectMocked(defaultRequestUri, otherResponse);
+
+    fetchMock.disableMocks();
+
+    globalThis.fetch = vi.fn(async () => Promise.resolve(new Response(realResponse)));
+   
+    await expectUnmocked();
+
+    globalThis.fetch = crossFetch
+   
   });
 });
 
