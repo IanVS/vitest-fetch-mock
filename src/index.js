@@ -1,4 +1,4 @@
-import crossFetch from 'cross-fetch';
+const crossFetch = require('cross-fetch');
 
 // Modified from https://github.com/jimmywarting/node-domexception,
 // which is commonjs only.
@@ -261,6 +261,12 @@ export default function createFetchMocker(vi) {
 
   fetch.enableMocks = () => {
     globalThis.fetchMock = globalThis.fetch = fetch;
+    vi.doMock('cross-fetch', () => {
+      return { ...crossFetch, default: () => {
+        return globalThis.fetch.apply(null, arguments);
+      }
+    };
+    });
   };
 
   fetch.disableMocks = () => {
