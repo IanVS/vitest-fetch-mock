@@ -4,10 +4,12 @@ import crossFetch from 'cross-fetch';
 // which is commonjs only.
 if (!globalThis.DOMException) {
   try {
-    const { MessageChannel } = await import('worker_threads'),
-      port = new MessageChannel().port1,
-      ab = new ArrayBuffer();
-    port.postMessage(ab, [ab, ab]);
+    (async () => {
+      const { MessageChannel } = await import('worker_threads'),
+        port = new MessageChannel().port1,
+        ab = new ArrayBuffer();
+      port.postMessage(ab, [ab, ab]);
+    })();
   } catch (err) {
     err.constructor.name === 'DOMException' && (globalThis.DOMException = err.constructor);
   }
