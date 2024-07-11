@@ -60,8 +60,8 @@ export default function createFetchMocker(vi) {
       urlOrPredicate instanceof RegExp
         ? (input) => urlOrPredicate.test(input.url)
         : typeof urlOrPredicate === 'string'
-        ? (input) => input.url === urlOrPredicate
-        : urlOrPredicate;
+          ? (input) => input.url === urlOrPredicate
+          : urlOrPredicate;
     return (input, reqInit) => {
       const req = normalizeRequest(input, reqInit);
       return [predicate(req), req];
@@ -242,7 +242,7 @@ export default function createFetchMocker(vi) {
       try {
         let req = normalizeRequest(call[0], call[1]);
         requests.push(req);
-      } catch(e) {
+      } catch (e) {
         // ignore
       }
     });
