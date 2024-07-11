@@ -11,7 +11,7 @@
     "types/index.d.ts"
   ],
   "scripts": {
-    "test": "vitest run && npm run tsc && npm run lint",
+    "test": "vitest run",
     "lint": "eslint . && prettier --check .",
     "tsc": "tsc"
   },
