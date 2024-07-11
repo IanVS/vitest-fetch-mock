@@ -19,6 +19,7 @@ supports Node.js and any browser-like runtime.
 ## Contents
 
 - [Usage](#usage)
+  - [Compatibility](#compatibility)
   - [Package Installation](#package-installation)
   - [Setup for all tests](#to-setup-for-all-tests)
   - [Setup for an individual test](#to-setup-for-an-individual-test)
@@ -34,6 +35,11 @@ supports Node.js and any browser-like runtime.
   - [Using functions to mock slow servers](#using-functions-to-mock-slow-servers)
 
 ## Usage
+
+### Compatibility
+
+The most recent version of vitest-fetch-mock supports vitest 2. If you are using vitest version 1.x, please install
+vitest-fetch-mock0.2.2.
 
 ### Package Installation
 
