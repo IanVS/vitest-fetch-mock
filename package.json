@@ -44,7 +44,7 @@
     "node": ">=14.14.0"
   },
   "dependencies": {
-    "cross-fetch": "^3.0.6"
+    "cross-fetch": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
