@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test": "vitest run && npm run tsc && npm run lint",
-    "lint": "eslint .",
+    "lint": "eslint . && prettier --check .",
     "tsc": "tsc"
   },
   "repository": {
