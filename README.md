@@ -614,13 +614,13 @@ describe('getYear action creator', () => {
 
 ### Using `fetch.mock` to inspect the mock state of each fetch call
 
-`fetch.mock` by default uses [Vitest's mocking functions](https://vitest.dev/api/mock.html). Therefore
-you can make assertions on the mock state. In this example we have an arbitrary function that makes a different fetch
-request based on the argument you pass to it. In our test, we run Vitest's `beforeEach()` and make sure to reset our
-mock before each `it()` block as we will make assertions on the arguments we are passing to `fetch()`. Then we use the 
-`fetch.requests()` function to give us a history of all non-aborted requests (normalized) that were made.  It can give you 
-information on each call, and their arguments which you can use for your `expect()` calls. Vitest also comes with some 
-nice aliases for the most used ones.
+`fetch.mock` by default uses [Vitest's mocking functions](https://vitest.dev/api/mock.html). Therefore you can make
+assertions on the mock state. In this example we have an arbitrary function that makes a different fetch request based
+on the argument you pass to it. In our test, we run Vitest's `beforeEach()` and make sure to reset our mock before each
+`it()` block as we will make assertions on the arguments we are passing to `fetch()`. Then we use the `fetch.requests()`
+function to give us a history of all non-aborted requests (normalized) that were made. It can give you information on
+each call, and their arguments which you can use for your `expect()` calls. Vitest also comes with some nice aliases for
+the most used ones.
 
 ```js
 // api.js
@@ -670,7 +670,7 @@ describe('testing api', () => {
     APIRequest('twitter');
 
     expect(fetch).toBeCalled(); // alias for expect(fetch.mock.calls.length).toEqual(1);
-    expect(fetch.requests().map(v => v.url)).toContain('https://twitter.com/');
+    expect(fetch.requests().map((v) => v.url)).toContain('https://twitter.com/');
   });
 });
 ```

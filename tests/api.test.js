@@ -76,7 +76,7 @@ describe('testing mockResponse and alias once', () => {
 
     expect(response).toEqual({ secret_data: 'abcde' });
     expect(fetch.requests().length).toEqual(1);
-    expect(fetch.requests()[0].method).toEqual("GET");
+    expect(fetch.requests()[0].method).toEqual('GET');
   });
 
   it('supports an object with a stringifier', async () => {
