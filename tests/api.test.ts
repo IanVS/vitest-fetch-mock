@@ -219,7 +219,7 @@ describe('request', () => {
     fetch.disableMocks();
   });
 
-  it('passes input and init to response function', async () => {
+  it('passes input and init to response function', () => {
     const url = 'http://foo.bar/';
     const requestInit = {
       headers: {
@@ -235,11 +235,12 @@ describe('request', () => {
     fetch.mockResponse((input) => {
       expect(input).toHaveProperty('url', url);
       expect(input.headers.get('foo')).toEqual('bar');
-      return Promise.resolve({ body: response, ...responseInit });
+      return Promise.resolve(response);
+    }, responseInit);
+    return fetch(url, requestInit).then((resp) => {
+      expect(resp.headers.get('bing')).toEqual(responseInit.headers.bing);
+      return expect(resp.text()).resolves.toEqual(response);
     });
-    const resp = await fetch(url, requestInit);
-    expect(resp.headers.get('bing')).toEqual(responseInit.headers.bing);
-    await expect(resp.text()).resolves.toEqual(response);
   });
 
   it('returns object when response is json', async () => {
