@@ -294,8 +294,6 @@ class FetchMockObject {
   ): FetchMock {
     return this.doMockOnceIf(urlOrPredicate, responseProviderOrBody, params);
   }
-
-  // mockOnceIf(); // doMocKOnceIf
 }
 
 type UrlOrPredicate = string | RegExp | ((input: Request) => boolean);
@@ -316,8 +314,6 @@ export interface MockParams {
 export interface MockResponse extends MockParams {
   body?: string;
 }
-
-// class FetchMock
 
 // factory
 export default function createFetchMock(): FetchMock {
