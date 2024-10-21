@@ -343,14 +343,17 @@ describe('request', () => {
     return expect(response.text()).resolves.toEqual('ok');
   });
 
-  it('resolves with function returning response', async () => {
-    fetch.mockResponseOnce(() => ({
-      body: 'ok',
-      headers: { ding: 'dang' },
-      status: 201,
-      statusText: 'text',
-      url: 'http://foo',
-    }));
+  it('resolves with function returning object body and extends mock params', async () => {
+    fetch.mockResponseOnce(
+      () => ({
+        body: 'ok',
+        headers: { ding: 'dang' },
+        status: 201,
+        statusText: 'text',
+        url: 'http://foo',
+      }),
+      { headers: { bash: 'bang' } }
+    );
 
     const response = await fetch('https://bar', {});
     expect(response.headers.get('ding')).toEqual('dang');
