@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist"
+  },
+  "include": [
+    "./setupVitest.ts",
+    "./src/**/*.ts",
+    "./src/**/*.ts"
+  ]
+}

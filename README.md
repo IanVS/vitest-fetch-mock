@@ -13,8 +13,8 @@ requests. It's easy to setup and you don't need a library like `nock` to get goi
 for mocking under the surface. This means that any of the `vi.fn()` methods are also available. For more information on
 the vitest mock API, check their docs [here](https://vitest.dev/guide/mocking.html)
 
-It currently supports the mocking with the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) polyfill, so it
-supports Node.js and any browser-like runtime.
+As of version 0.4.0, `vitest-fetch-mock` mocks the global [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch) method,
+which should be present in all modern runtimes and browsers.
 
 ## Contents
 
@@ -631,8 +631,6 @@ the most used ones.
 ```js
 // api.js
 
-import 'cross-fetch';
-
 export function APIRequest(who) {
   if (who === 'facebook') {
     return fetch('https://facebook.com');
@@ -749,16 +747,14 @@ For convenience, all the conditional mocking functions also accept optional para
 #### Conditional Mocking examples
 
 ```js
-import crossFetch from 'cross-fetch';
-
-vi.mock('cross-fetch', async () => {
-  const crossFetchActual = await requireActual('cross-fetch');
+vi.mock('fetch', async () => {
+  const fetchActual = globalThis.fetch;
   const mocked = {};
-  for (const key of Object.keys(crossFetchActual)) {
-    if (typeof crossFetchActual[key] === 'function') {
-      mocked[key] = vi.fn(crossFetchActual[key]);
+  for (const key of Object.keys(fetchActual)) {
+    if (typeof fetchActual[key] === 'function') {
+      mocked[key] = vi.fn(fetchActual[key]);
     } else {
-      mocked[key] = crossFetchActual[key];
+      mocked[key] = fetchActual[key];
     }
   }
   return mocked;
@@ -768,18 +764,18 @@ describe('conditional mocking', () => {
   const realResponse = 'REAL FETCH RESPONSE'
   const mockedDefaultResponse = 'MOCKED DEFAULT RESPONSE'
   const testUrl = defaultRequestUri
-  let crossFetchSpy
+  let fetchSpy
   beforeEach(() => {
     fetch.resetMocks()
     fetch.mockResponse(mockedDefaultResponse)
-    vi.mocked(crossFetch)
+    vi.mocked(fetch)
       .mockImplementation(async () =>
         Promise.resolve(new Response(realResponse))
       )
   })
 
   afterEach(() => {
-    vi.mocked(crossFetch).mockRestore()
+    vi.mocked(fetch).mockRestore()
   })
 
   const expectMocked = async (uri, response = mockedDefaultResponse) => {
@@ -981,16 +977,14 @@ describe('conditional mocking', () => {
 ```
 
 ```js
-import crossFetch from 'cross-fetch';
-
-vi.mock('cross-fetch', async () => {
-  const crossFetchActual = await requireActual('cross-fetch');
+vi.mock('fetch', async () => {
+  const fetchActual = globalThis.fetch;
   const mocked = {};
-  for (const key of Object.keys(crossFetchActual)) {
-    if (typeof crossFetchActual[key] === 'function') {
-      mocked[key] = vi.fn(crossFetchActual[key]);
+  for (const key of Object.keys(fetchActual)) {
+    if (typeof fetchActual[key] === 'function') {
+      mocked[key] = vi.fn(fetchActual[key]);
     } else {
-      mocked[key] = crossFetchActual[key];
+      mocked[key] = fetchActual[key];
     }
   }
   return mocked;
@@ -1007,15 +1001,15 @@ describe('conditional mocking complex', () => {
   const realResponse = 'REAL FETCH RESPONSE';
   const mockedDefaultResponse = 'MOCKED DEFAULT RESPONSE';
   const testUrl = defaultRequestUri;
-  let crossFetchSpy;
+  let fetchSpy;
   beforeEach(() => {
     fetch.resetMocks();
     fetch.mockResponse(mockedDefaultResponse);
-    vi.mocked(crossFetch).mockImplementation(async () => Promise.resolve(new Response(realResponse)));
+    vi.mocked(fetch).mockImplementation(async () => Promise.resolve(new Response(realResponse)));
   });
 
   afterEach(() => {
-    vi.mocked(crossFetch).mockRestore();
+    vi.mocked(fetch).mockRestore();
   });
 
   describe('complex example', () => {

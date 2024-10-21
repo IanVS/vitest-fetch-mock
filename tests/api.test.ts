@@ -1,27 +1,38 @@
-import { describe, afterEach, beforeEach, it, test, expect, vi } from 'vitest';
-import { APIRequest, APIRequest2, defaultRequestUri, request } from './api';
-import crossFetch from 'cross-fetch';
+import { describe, beforeEach, it, test, expect, vi, afterEach, beforeAll, afterAll } from 'vitest';
+import { APIRequest, APIRequest2, defaultRequestUri, request } from './api.js';
+import { createFetchMock, type FetchMock, type MockResponse } from '../src/index.js';
 
-describe('testing mockResponse and alias once', () => {
-  beforeEach(() => {
+describe('testing mockResponse', () => {
+  const fetch = createFetchMock();
+
+  beforeAll(() => {
+    fetch.enableMocks();
+  });
+
+  afterEach(() => {
     fetch.resetMocks();
   });
+
+  afterAll(() => {
+    fetch.disableMocks();
+  });
+
   it('mocks a response', async () => {
-    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }, { status: 200 }));
+    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }), { status: 200 });
 
     const response = await APIRequest('google');
 
     expect(response).toEqual({ secret_data: 'abcde' });
     expect(fetch.mock.calls.length).toEqual(1);
-    expect(fetch.mock.calls[0][0]).toEqual('https://google.com');
+    expect(fetch.mock.calls[0]![0]).toEqual('https://google.com');
     expect(fetch.requests().length).toEqual(1);
-    expect(fetch.requests()[0].url).toEqual('https://google.com/');
+    expect(fetch.requests()[0]!.url).toEqual('https://google.com/');
   });
 
   it('mocks a response with chaining', async () => {
     fetch
-      .mockResponseOnce(JSON.stringify({ secret_data: '12345' }, { status: 200 }))
-      .mockResponseOnce(JSON.stringify({ secret_data: '67891' }, { status: 200 }));
+      .mockResponseOnce(JSON.stringify({ secret_data: '12345' }), { status: 200 })
+      .mockResponseOnce(JSON.stringify({ secret_data: '67891' }), { status: 200 });
 
     const response = await APIRequest('facebook');
 
@@ -29,18 +40,18 @@ describe('testing mockResponse and alias once', () => {
 
     expect(fetch.mock.calls.length).toEqual(2);
 
-    expect(fetch.mock.calls[0][0]).toEqual('https://facebook.com/someOtherResource');
-    expect(fetch.mock.calls[1][0]).toEqual('https://facebook.com');
+    expect(fetch.mock.calls[0]![0]).toEqual('https://facebook.com/someOtherResource');
+    expect(fetch.mock.calls[1]![0]).toEqual('https://facebook.com');
   });
 
   it('mocks a response with alias .once', async () => {
-    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }, { status: 200 }));
+    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }), { status: 200 });
 
     const response = await APIRequest('google');
 
     expect(response).toEqual({ secret_data: 'abcde' });
     expect(fetch.mock.calls.length).toEqual(1);
-    expect(fetch.mock.calls[0][0]).toEqual('https://google.com');
+    expect(fetch.mock.calls[0]![0]).toEqual('https://google.com');
   });
 
   it('mocks a response with chaining with alias .once', async () => {
@@ -54,46 +65,57 @@ describe('testing mockResponse and alias once', () => {
 
     expect(fetch.mock.calls.length).toEqual(2);
 
-    expect(fetch.mock.calls[0][0]).toEqual('https://facebook.com/someOtherResource');
-    expect(fetch.requests()[0].url).toEqual('https://facebook.com/someOtherResource');
-    expect(fetch.mock.calls[1][0]).toEqual('https://facebook.com');
+    expect(fetch.mock.calls[0]![0]).toEqual('https://facebook.com/someOtherResource');
+    expect(fetch.requests()[0]!.url).toEqual('https://facebook.com/someOtherResource');
+    expect(fetch.mock.calls[1]![0]).toEqual('https://facebook.com');
   });
 
   it('supports URLs', async () => {
-    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }, { status: 200 }));
+    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }), { status: 200 });
 
     const response = await APIRequest('instagram');
 
     expect(response).toEqual({ secret_data: 'abcde' });
     expect(fetch.mock.calls.length).toEqual(1);
-    expect(fetch.mock.calls[0][0]).toEqual(new URL('https://instagram.com'));
+    expect(fetch.mock.calls[0]![0]).toEqual(new URL('https://instagram.com'));
   });
 
   it('returns normalized requests', async () => {
-    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }, { status: 200 }));
+    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }), { status: 200 });
 
     const response = await APIRequest('instagram');
 
     expect(response).toEqual({ secret_data: 'abcde' });
     expect(fetch.requests().length).toEqual(1);
-    expect(fetch.requests()[0].method).toEqual('GET');
+    expect(fetch.requests()[0]!.method).toEqual('GET');
   });
 
   it('supports an object with a stringifier', async () => {
-    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }, { status: 200 }));
+    fetch.mockResponseOnce(JSON.stringify({ secret_data: 'abcde' }), { status: 200 });
 
     const response = await APIRequest('instagram');
 
     expect(response).toEqual({ secret_data: 'abcde' });
     expect(fetch.mock.calls.length).toEqual(1);
-    expect(fetch.mock.calls[0][0]).toEqual(new URL('https://instagram.com'));
+    expect(fetch.mock.calls[0]![0]).toEqual(new URL('https://instagram.com'));
   });
 });
 
 describe('testing mockResponses', () => {
-  beforeEach(() => {
+  const fetch = createFetchMock();
+
+  beforeAll(() => {
+    fetch.enableMocks();
+  });
+
+  afterEach(() => {
     fetch.resetMocks();
   });
+
+  afterAll(() => {
+    fetch.disableMocks();
+  });
+
   it('mocks multiple responses', async () => {
     fetch.mockResponses(
       [JSON.stringify({ name: 'naruto', average_score: 79 })],
@@ -107,14 +129,27 @@ describe('testing mockResponses', () => {
     ]);
     expect(fetch.mock.calls.length).toEqual(2);
 
-    expect(fetch.mock.calls[0][0]).toEqual('https://facebook.com/someOtherResource');
-    expect(fetch.mock.calls[1][0]).toEqual('https://facebook.com');
+    expect(fetch.mock.calls[0]![0]).toEqual('https://facebook.com/someOtherResource');
+    expect(fetch.mock.calls[1]![0]).toEqual('https://facebook.com');
   });
 });
 
 describe('Mocking aborts', () => {
-  beforeEach(() => {
+  const fetch = createFetchMock();
+
+  beforeAll(() => {
+    fetch.enableMocks();
+  });
+
+  afterEach(() => {
     fetch.resetMocks();
+  });
+
+  afterAll(() => {
+    fetch.disableMocks();
+  });
+
+  beforeEach(() => {
     vi.useFakeTimers();
   });
   afterEach(() => {
@@ -132,29 +167,35 @@ describe('Mocking aborts', () => {
   });
 
   it('throws when passed an already aborted abort signal in the request init', () => {
-    if (typeof AbortController !== 'undefined') {
-      const c = new AbortController();
-      c.abort();
-      expect(() => fetch('/', { signal: c.signal })).toThrow(expect.any(DOMException));
-    }
+    const c = new AbortController();
+    c.abort();
+    expect(() => fetch('/', { signal: c.signal })).toThrow(expect.any(DOMException));
   });
 
   it('rejects when aborted before resolved', async () => {
-    if (typeof AbortController !== 'undefined') {
-      const c = new AbortController();
-      fetch.mockResponse(async () => {
-        vi.advanceTimersByTime(60);
-        return '';
-      });
-      setTimeout(() => c.abort(), 50);
-      await expect(fetch('/', { signal: c.signal })).rejects.toThrow(expect.any(DOMException));
-    }
+    const c = new AbortController();
+    fetch.mockResponse(async () => {
+      vi.advanceTimersByTime(60);
+      return '';
+    });
+    setTimeout(() => c.abort(), 50);
+    await expect(fetch('http://foo.bar/', { signal: c.signal })).rejects.toThrow(expect.any(DOMException));
   });
 });
 
 describe('Mocking rejects', () => {
-  beforeEach(() => {
+  const fetch = createFetchMock();
+
+  beforeAll(() => {
+    fetch.enableMocks();
+  });
+
+  afterEach(() => {
     fetch.resetMocks();
+  });
+
+  afterAll(() => {
+    fetch.disableMocks();
   });
 
   it('mocking rejects', async () => {
@@ -164,11 +205,21 @@ describe('Mocking rejects', () => {
 });
 
 describe('request', () => {
-  beforeEach(() => {
+  const fetch = createFetchMock();
+
+  beforeAll(() => {
+    fetch.enableMocks();
+  });
+
+  afterEach(() => {
     fetch.resetMocks();
   });
 
-  it('passes input and init to response function', () => {
+  afterAll(() => {
+    fetch.disableMocks();
+  });
+
+  it('passes input and init to response function', async () => {
     const url = 'http://foo.bar/';
     const requestInit = {
       headers: {
@@ -184,12 +235,11 @@ describe('request', () => {
     fetch.mockResponse((input) => {
       expect(input).toHaveProperty('url', url);
       expect(input.headers.get('foo')).toEqual('bar');
-      return Promise.resolve(response);
-    }, responseInit);
-    return fetch(url, requestInit).then((resp) => {
-      expect(resp.headers.get('bing')).toEqual(responseInit.headers.bing);
-      return expect(resp.text()).resolves.toEqual(response);
+      return Promise.resolve({ body: response, ...responseInit });
     });
+    const resp = await fetch(url, requestInit);
+    expect(resp.headers.get('bing')).toEqual(responseInit.headers.bing);
+    await expect(resp.text()).resolves.toEqual(response);
   });
 
   it('returns object when response is json', async () => {
@@ -244,7 +294,7 @@ describe('request', () => {
       const _response = await request();
       throw Error('Should have rejected with error data');
     } catch (error) {
-      expect(error.message).toBe(errorData.error);
+      expect(error).toMatchObject({ message: errorData.error });
     }
   });
 
@@ -277,16 +327,12 @@ describe('request', () => {
     const errorData = {
       error: 'Uh oh, something has gone wrong. Please tweet us @randomapi about the issue. Thank you.',
     };
-    fetch.mockRejectOnce(() => new Promise((_, reject) => setTimeout(() => reject(JSON.stringify(errorData)))), 100);
-    try {
-      await request();
-    } catch (error) {
-      expect(error.message).toBe(errorData.error);
-    }
+    fetch.mockRejectOnce(() => new Promise((_, reject) => setTimeout(() => reject(JSON.stringify(errorData)), 100)));
+    expect(request()).rejects.toThrowError(errorData.error);
   });
 
   it('resolves with function returning object body and init headers', async () => {
-    fetch.mockResponseOnce(() => Promise.resolve({ body: 'ok', init: { headers: { ding: 'dang' } } }), {
+    fetch.mockResponseOnce(() => Promise.resolve<MockResponse>({ body: 'ok', headers: { ding: 'dang' } }), {
       headers: { bash: 'bang' },
     });
 
@@ -296,17 +342,14 @@ describe('request', () => {
     return expect(response.text()).resolves.toEqual('ok');
   });
 
-  it('resolves with function returning object body and extends mock params', async () => {
-    fetch.mockResponseOnce(
-      () => ({
-        body: 'ok',
-        headers: { ding: 'dang' },
-        status: 201,
-        statusText: 'text',
-        url: 'http://foo',
-      }),
-      { headers: { bash: 'bang' } }
-    );
+  it('resolves with function returning response', async () => {
+    fetch.mockResponseOnce(() => ({
+      body: 'ok',
+      headers: { ding: 'dang' },
+      status: 201,
+      statusText: 'text',
+      url: 'http://foo',
+    }));
 
     const response = await fetch('https://bar', {});
     expect(response.headers.get('ding')).toEqual('dang');
@@ -329,24 +372,32 @@ describe('conditional mocking', () => {
   const realResponse = 'REAL FETCH RESPONSE';
   const mockedDefaultResponse = 'MOCKED DEFAULT RESPONSE';
   const testUrl = defaultRequestUri;
-  let crossFetchSpy;
 
-  beforeEach(() => {
-    fetch.resetMocks();
+  let originalFetch: typeof global.fetch;
+  let fetch: FetchMock;
+
+  beforeEach(async () => {
+    originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn(async () => Promise.resolve(new Response(realResponse)));
+    fetch = createFetchMock();
+
+    await expectUnmocked();
+
+    fetch.enableMocks();
     fetch.mockResponse(mockedDefaultResponse);
-    crossFetchSpy = vi
-      .spyOn(crossFetch, 'fetch')
-      .mockImplementation(async () => Promise.resolve(new Response(realResponse)));
+
+    await expectMocked();
   });
 
   afterEach(() => {
-    crossFetchSpy.mockRestore();
+    fetch.disableMocks();
+    globalThis.fetch = originalFetch;
   });
 
-  const expectMocked = async (uri, response = mockedDefaultResponse) => {
+  const expectMocked = async (uri?: string, response = mockedDefaultResponse) => {
     return expect(request(uri)).resolves.toEqual(response);
   };
-  const expectUnmocked = async (uri) => {
+  const expectUnmocked = async (uri?: string) => {
     return expect(request(uri)).resolves.toEqual(realResponse);
   };
 
@@ -425,7 +476,7 @@ describe('conditional mocking', () => {
       fetch.doMockOnceIf('http://foo/', response).doMockOnceIf('http://foo2/', response2);
       await expectMocked('http://foo/', response);
       await expectMocked('http://foo2/', response2);
-      //await expectMocked('http://foo3', mockedDefaultResponse)
+      await expectMocked('http://foo3', mockedDefaultResponse);
     });
     it('mocks when matches regex', async () => {
       fetch.doMockOnceIf(new RegExp(testUrl));
@@ -693,13 +744,11 @@ describe('conditional mocking', () => {
 });
 
 it('enable/disable', async () => {
-  const createMocker = (await import('../src/index')).default;
-  console.log(createMocker);
-  const fetchMock = createMocker(vi);
-  fetchMock.disableMocks();
-  expect(vi.isMockFunction(fetch)).toBe(false);
-  fetchMock.enableMocks();
-  expect(vi.isMockFunction(fetch)).toBe(true);
-  fetchMock.disableMocks();
-  global.fetch = fetchMock;
+  expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
+  const fetch = createFetchMock();
+  expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
+  fetch.enableMocks();
+  expect(vi.isMockFunction(globalThis.fetch)).toBe(true);
+  fetch.disableMocks();
+  expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
 });

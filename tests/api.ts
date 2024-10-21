@@ -1,6 +1,4 @@
-import 'cross-fetch/polyfill';
-
-export async function APIRequest(who) {
+export async function APIRequest(who: string) {
   if (who === 'facebook') {
     const call1 = fetch('https://facebook.com/someOtherResource').then((res) => res.json());
     const call2 = fetch('https://facebook.com').then((res) => res.json());
@@ -10,16 +8,13 @@ export async function APIRequest(who) {
   } else if (who === 'instagram') {
     return fetch(new URL('https://instagram.com')).then((res) => res.json());
   } else if (who === 'bing') {
-    const stringifier = {
-      toString: () => 'https://bing.com',
-    };
-    return fetch(stringifier).then((res) => res.json());
+    return fetch(new URL('https://bing.com')).then((res) => res.json());
   } else {
     return fetch('https://google.com').then((res) => res.json());
   }
 }
 
-export function APIRequest2(who) {
+export function APIRequest2(who: string) {
   if (who === 'google') {
     return fetch('https://google.com').then((res) => res.json());
   } else {
@@ -32,7 +27,7 @@ export const defaultRequestUri = 'https://randomuser.me/api';
 export function request(uri = defaultRequestUri) {
   return fetch(uri, {})
     .then((response) => {
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers.get('content-type')!;
 
       if (/application\/json/.test(contentType)) {
         return response.json();

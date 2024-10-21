@@ -6,7 +6,4 @@ export default defineConfig({
       'vitest-fetch-mock': './src/index',
     },
   },
-  test: {
-    setupFiles: ['./setupVitest.ts'],
-  },
 });
