@@ -1,6 +1,6 @@
-import { MockResponseInit, createFetchMock } from 'vitest-fetch-mock';
+import setupFm, { MockResponseInit } from 'vitest-fetch-mock';
 
-const fetchMock = createFetchMock();
+const fetchMock = setupFm();
 
 fetchMock.mockResponse(JSON.stringify({foo: "bar"}));
 fetchMock.mockResponse(JSON.stringify({foo: "bar"}), {

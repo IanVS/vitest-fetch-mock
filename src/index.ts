@@ -320,7 +320,7 @@ export interface MockResponse extends MockParams {
 // class FetchMock
 
 // factory
-export function createFetchMock(): FetchMock {
+export default function createFetchMock(): FetchMock {
   const isMocking = vi.fn(always(true));
 
   const originalFetch = globalThis.fetch;

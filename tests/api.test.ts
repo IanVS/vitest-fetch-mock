@@ -1,6 +1,6 @@
 import { describe, beforeEach, it, test, expect, vi, afterEach, beforeAll, afterAll } from 'vitest';
 import { APIRequest, APIRequest2, defaultRequestUri, request } from './api.js';
-import { createFetchMock, type FetchMock, type MockResponse } from '../src/index.js';
+import createFetchMock, { type FetchMock, type MockResponse } from '../src/index.js';
 
 describe('testing mockResponse', () => {
   const fetch = createFetchMock();
