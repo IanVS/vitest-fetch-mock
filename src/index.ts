@@ -308,6 +308,7 @@ export interface MockParams {
   statusText?: string;
   headers?: [string, string][] | Record<string, string>; // HeadersInit
   url?: string;
+  /** Set >= 1 to have redirected return true. Only applicable to Node.js */
   counter?: number;
 }
 
