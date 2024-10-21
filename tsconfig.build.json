@@ -5,8 +5,6 @@
     "outDir": "./dist"
   },
   "include": [
-    "./setupVitest.ts",
-    "./src/**/*.ts",
     "./src/**/*.ts"
   ]
 }
