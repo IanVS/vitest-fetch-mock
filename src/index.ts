@@ -1,11 +1,11 @@
-import { vi } from 'vitest';
+import { vi as vitest } from 'vitest';
 import type { Mock } from '@vitest/spy';
 
 // type-definitions
 export type FetchMock = Mock<typeof global.fetch> & FetchMockObject;
 
 class FetchMockObject {
-  private readonly isMocking = vi.fn(always(true));
+  private readonly isMocking = vitest.fn(always(true));
 
   constructor(
     private mockedFetch: Mock<typeof global.fetch>,
@@ -317,7 +317,7 @@ export interface MockResponse extends MockParams {
 }
 
 // factory
-export default function createFetchMock(): FetchMock {
+export default function createFetchMock(vi: typeof vitest): FetchMock {
   const isMocking = vi.fn(always(true));
 
   const originalFetch = globalThis.fetch;

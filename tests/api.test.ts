@@ -3,7 +3,7 @@ import { APIRequest, APIRequest2, defaultRequestUri, request } from './api.js';
 import createFetchMock, { type FetchMock, type MockResponse } from '../src/index.js';
 
 describe('testing mockResponse', () => {
-  const fetch = createFetchMock();
+  const fetch = createFetchMock(vi);
 
   beforeAll(() => {
     fetch.enableMocks();
@@ -102,7 +102,7 @@ describe('testing mockResponse', () => {
 });
 
 describe('testing mockResponses', () => {
-  const fetch = createFetchMock();
+  const fetch = createFetchMock(vi);
 
   beforeAll(() => {
     fetch.enableMocks();
@@ -135,7 +135,7 @@ describe('testing mockResponses', () => {
 });
 
 describe('Mocking aborts', () => {
-  const fetch = createFetchMock();
+  const fetch = createFetchMock(vi);
 
   beforeAll(() => {
     fetch.enableMocks();
@@ -184,7 +184,7 @@ describe('Mocking aborts', () => {
 });
 
 describe('Mocking rejects', () => {
-  const fetch = createFetchMock();
+  const fetch = createFetchMock(vi);
 
   beforeAll(() => {
     fetch.enableMocks();
@@ -205,7 +205,7 @@ describe('Mocking rejects', () => {
 });
 
 describe('request', () => {
-  const fetch = createFetchMock();
+  const fetch = createFetchMock(vi);
 
   beforeAll(() => {
     fetch.enableMocks();
@@ -383,7 +383,7 @@ describe('conditional mocking', () => {
   beforeEach(async () => {
     originalFetch = globalThis.fetch;
     globalThis.fetch = vi.fn(async () => Promise.resolve(new Response(realResponse)));
-    fetch = createFetchMock();
+    fetch = createFetchMock(vi);
 
     await expectUnmocked();
 
@@ -749,7 +749,7 @@ describe('conditional mocking', () => {
 
 it('enable/disable', async () => {
   expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
-  const fetch = createFetchMock();
+  const fetch = createFetchMock(vi);
   expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
   fetch.enableMocks();
   expect(vi.isMockFunction(globalThis.fetch)).toBe(true);
