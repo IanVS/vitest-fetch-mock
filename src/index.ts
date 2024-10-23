@@ -5,7 +5,7 @@ import type { Mock } from '@vitest/spy';
 export type FetchMock = Mock<typeof global.fetch> & FetchMockObject;
 
 class FetchMockObject {
-  private readonly isMocking = vitest.fn(always(true));
+  public readonly isMocking = vitest.fn(always(true));
 
   constructor(
     private mockedFetch: Mock<typeof global.fetch>,
@@ -139,12 +139,16 @@ class FetchMockObject {
 
   // reject (error)
   mockReject(error?: ErrorOrFunction): FetchMock {
-    this.mockedFetch.mockImplementation(() => normalizeError(error));
+    this.mockedFetch.mockImplementation((input: RequestInput, requestInit?: RequestInit) =>
+      normalizeError(normalizeRequest(input, requestInit), error)
+    );
     return this.chainingResultProvider();
   }
 
   mockRejectOnce(error?: ErrorOrFunction): FetchMock {
-    this.mockedFetch.mockImplementationOnce(() => normalizeError(error));
+    this.mockedFetch.mockImplementationOnce((input: RequestInput, requestInit?: RequestInit) =>
+      normalizeError(normalizeRequest(input, requestInit), error)
+    );
     return this.chainingResultProvider();
   }
 
@@ -301,7 +305,7 @@ type RequestInput = string | URL | Request;
 type ResponseProvider = (request: Request) => ResponseLike | Promise<ResponseLike>;
 type ResponseLike = MockResponse | ResponseBody | Response;
 type ResponseBody = string;
-type ErrorOrFunction = Error | string | ((...args: any[]) => Promise<Response>);
+type ErrorOrFunction = Error | ResponseBody | ResponseProvider;
 
 export interface MockParams {
   status?: number;
@@ -411,8 +415,12 @@ function always(toggle: boolean): (input: RequestInput, requestInit?: RequestIni
   return () => toggle;
 }
 
-const normalizeError = (errorOrFunction?: ErrorOrFunction): Promise<Response> =>
-  typeof errorOrFunction === 'function' ? errorOrFunction() : Promise.reject(errorOrFunction);
+const normalizeError = async (request: Request, errorOrFunction?: ErrorOrFunction): Promise<Response> =>
+    errorOrFunction instanceof Error
+        ? Promise.reject(errorOrFunction)
+        : typeof errorOrFunction === 'function'
+            ? buildResponse(request, errorOrFunction)
+            : Promise.reject(errorOrFunction);
 
 function abortError(): Error {
   return new DOMException('The operation was aborted.');

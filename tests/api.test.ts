@@ -277,7 +277,7 @@ describe('request', () => {
 
     try {
       const response = await request();
-      expect(response.type).toBe(contentType);
+      expect(response).toMatchObject({ message: contentType });
     } catch (e) {
       console.log(e);
     }

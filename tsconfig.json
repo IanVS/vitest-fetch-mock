@@ -8,7 +8,7 @@
     "baseUrl": "./",
     "paths": {
       "vitest-fetch-mock": [
-        "./src"
+        "./src/index.ts"
       ]
     },
     "strict": true,
@@ -27,6 +27,8 @@
     "noEmit": true
   },
   "include": [
-    "./src/**/*.ts"
+    "./src/**/*.ts",
+    "./tests/**/*.ts",
+    "./types/**/*.ts"
   ]
 }

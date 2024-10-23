@@ -1,6 +1,7 @@
-import setupFm, { MockResponseInit } from 'vitest-fetch-mock';
+import setupFm, { type MockResponse } from 'vitest-fetch-mock';
+import { vi } from 'vitest';
 
-const fetchMock = setupFm();
+const fetchMock = setupFm(vi);
 
 fetchMock.mockResponse(JSON.stringify({foo: "bar"}));
 fetchMock.mockResponse(JSON.stringify({foo: "bar"}), {
@@ -85,14 +86,14 @@ fetchMock.doMockOnce();
 fetchMock.dontMockOnce();
 fetchMock.mockOnce();
 
-async function someAsyncHandler(): Promise<MockResponseInit> {
+async function someAsyncHandler(): Promise<MockResponse> {
     return {
         status: 200,
         body: await someAsyncStringHandler()
     };
 }
 
-function someSyncHandler(): MockResponseInit {
+function someSyncHandler(): MockResponse {
     return {
         status: 200,
         body: someSyncStringHandler()
