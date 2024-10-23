@@ -9,9 +9,6 @@ module.exports = {
   parserOptions: {
     tsconfigRootDir: __dirname,
     project: './tsconfig.json',
-    // Because we are setting "type": "module" in our package.json, all `.js` files are treated as modules
-    // Sometimes we will want a commonjs file, like this eslint config, in which case we use the .cjs extension
-    extraFileExtensions: ['.cjs'],
   },
   plugins: ['@typescript-eslint'],
   rules: {

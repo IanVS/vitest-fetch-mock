@@ -11,8 +11,8 @@
     "type-check": "tsc",
     "test": "vitest run",
     "test:watch": "vitest run --watch",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "format": "prettier src --write",
     "format:check": "prettier src --check",
     "build": "tsc -p tsconfig.build.json"
