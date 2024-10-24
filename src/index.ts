@@ -416,11 +416,11 @@ function always(toggle: boolean): (input: RequestInput, requestInit?: RequestIni
 }
 
 const normalizeError = async (request: Request, errorOrFunction?: ErrorOrFunction): Promise<Response> =>
-    errorOrFunction instanceof Error
-        ? Promise.reject(errorOrFunction)
-        : typeof errorOrFunction === 'function'
-            ? buildResponse(request, errorOrFunction)
-            : Promise.reject(errorOrFunction);
+  errorOrFunction instanceof Error
+    ? Promise.reject(errorOrFunction)
+    : typeof errorOrFunction === 'function'
+      ? buildResponse(request, errorOrFunction)
+      : Promise.reject(errorOrFunction);
 
 function abortError(): Error {
   return new DOMException('The operation was aborted.');
