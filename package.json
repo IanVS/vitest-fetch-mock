@@ -3,16 +3,19 @@
   "version": "0.3.0",
   "description": "fetch mock for vitest",
   "type": "module",
-  "main": "src/index.js",
-  "module": "src/index.js",
-  "files": [
-    "src",
-    "types/index.d.ts"
-  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["./dist/**.*"],
   "scripts": {
+    "type-check": "tsc",
     "test": "vitest run",
-    "lint": "eslint . && prettier --check .",
-    "tsc": "tsc"
+    "test:watch": "vitest run --watch",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier src --write",
+    "format:check": "prettier src --check",
+    "build": "tsc -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -40,20 +43,17 @@
   },
   "homepage": "https://github.com/IanVS/vitest-fetch-mock#readme",
   "engines": {
-    "node": ">=14.14.0"
-  },
-  "dependencies": {
-    "cross-fetch": "^4.0.0"
+    "node": ">=18.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.14.10",
+    "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "eslint": "^8.56.0",
     "jsdom": "^24.1.0",
     "prettier": "^3.3.2",
-    "typescript": "~5.5.3",
-    "vitest": "^2.0.2"
+    "typescript": "~5.5.0",
+    "vitest": "2.0.2"
   },
   "peerDependencies": {
     "vitest": ">=2.0.0"
