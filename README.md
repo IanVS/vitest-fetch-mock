@@ -3,18 +3,20 @@
 ![Node.js CI](https://github.com/IanVS/vitest-fetch-mock/workflows/Node.js%20CI/badge.svg)
 
 This project was forked from [jest-fetch-mock](https://github.com/jefflau/jest-fetch-mock), and tweaked slightly to run
-with vitest instead of jest. It is mostly compatible with `jest-fetch-mock`, with the main difference being that you
+with Vitest instead of Jest. It is mostly compatible with `jest-fetch-mock`, with the main difference being that you
 need to create fetchMock with a function call, and provide `vi` to it, rather than relying on a global `vi` or (`jest`
 in jest-fetch-mock's case). See [Usage](#usage) for more details.
 
-Fetch is the canonical way to do HTTP requests in the browser, and it can be used in other environments such as React
-Native. Vitest Fetch Mock allows you to easily mock your `fetch` calls and return the response you need to fake the HTTP
-requests. It's easy to setup and you don't need a library like `nock` to get going and it uses Vitest's built-in support
-for mocking under the surface. This means that any of the `vi.fn()` methods are also available. For more information on
-the vitest mock API, check their docs [here](https://vitest.dev/guide/mocking.html)
+Fetch is the canonical way to do HTTP requests in the browser and other modern runtimes. Vitest Fetch Mock allows you to
+easily mock your `fetch` calls and return the response you need to fake the HTTP requests. It's easy to setup and you
+don't need a library like `nock` to get going and it uses Vitest's built-in support for mocking under the surface. This
+means that any of the `vi.fn()` methods are also available. For more information on the Vitest mock API, check their
+docs [here](https://vitest.dev/guide/mocking.html)
 
-As of version 0.4.0, `vitest-fetch-mock` mocks the global [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch) method,
-which should be present in all modern runtimes and browsers.
+As of version 0.4.0, `vitest-fetch-mock` mocks the global
+[Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch) method, which is present in all modern runtimes
+and browsers. Previous versions used a fetch polyfill to run in older versions of Node.js. See
+[Compatibility](#compatibility) for details.
 
 ## Contents
 
@@ -38,8 +40,8 @@ which should be present in all modern runtimes and browsers.
 
 ### Compatibility
 
-The most recent version of vitest-fetch-mock supports vitest 2. If you are using vitest version 1.x, please install
-vitest-fetch-mock0.2.2.
+The most recent versions of vitest-fetch-mock support Vitest 2 and Node.js 18 and above. If you are using Vitest version
+1.x or an older version of node, please install `vitest-fetch-mock0.2.2`.
 
 ### Package Installation
 
