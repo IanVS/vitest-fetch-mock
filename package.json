@@ -1,12 +1,14 @@
 {
   "name": "vitest-fetch-mock",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "fetch mock for vitest",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["./dist/**.*"],
+  "files": [
+    "./dist/**.*"
+  ],
   "scripts": {
     "type-check": "tsc",
     "test": "vitest run",
