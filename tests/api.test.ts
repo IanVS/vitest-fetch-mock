@@ -99,6 +99,42 @@ describe('testing mockResponse', () => {
     expect(fetch.mock.calls.length).toEqual(1);
     expect(fetch.mock.calls[0]![0]).toEqual(new URL('https://instagram.com'));
   });
+
+    it('should allow empty response bodies', async () => {
+        fetch.mockResponseOnce(null, { status: 204 });
+        fetch.mockResponseOnce(undefined, { status: 204 });
+        fetch.mockResponseOnce(() => null, { status: 204 });
+        fetch.mockResponseOnce(() => undefined, { status: 204 });
+        fetch.mockResponseOnce(() => Promise.resolve(null), { status: 204 });
+        fetch.mockResponseOnce(() => Promise.resolve(undefined), { status: 204 });
+        fetch.mockResponseOnce({ status: 204 });
+        fetch.mockResponseOnce(() => ({ status: 204 }));
+        fetch.mockResponseOnce(() => Promise.resolve({ status: 204 }));
+        fetch.mockResponseOnce(new Response(null, { status: 204 }));
+        fetch.mockResponseOnce(new Response(undefined, { status: 204 }));
+        fetch.mockResponseOnce(() => new Response(null, { status: 204 }));
+        fetch.mockResponseOnce(() => new Response(undefined, { status: 204 }));
+        fetch.mockResponseOnce(() => Promise.resolve(new Response(null, { status: 204 })));
+        fetch.mockResponseOnce(() => Promise.resolve(new Response(undefined, { status: 204 })));
+        fetch.mockResponseOnce('done');
+
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('');
+        expect(await request()).toBe('done');
+    });
 });
 
 describe('testing mockResponses', () => {
