@@ -747,6 +747,46 @@ describe('conditional mocking', () => {
   });
 });
 
+describe('overloads', () => {
+  const fetch = createFetchMock(vi);
+
+  beforeAll(() => {
+    fetch.enableMocks();
+  });
+
+  afterEach(() => {
+    fetch.resetMocks();
+  });
+
+  afterAll(() => {
+    fetch.disableMocks();
+  });
+
+  it('should allow different types of overloads', async () => {
+    fetch.mockResponseOnce('a');
+    fetch.mockResponseOnce({ body: 'b' });
+    fetch.mockResponseOnce(new Response('c'));
+
+    fetch.mockResponseOnce(() => 'd');
+    fetch.mockResponseOnce(() => ({ body: 'e' }));
+    fetch.mockResponseOnce(() => new Response('f'));
+
+    fetch.mockResponseOnce(() => Promise.resolve('g'));
+    fetch.mockResponseOnce(() => Promise.resolve({ body: 'h' }));
+    fetch.mockResponseOnce(() => Promise.resolve(new Response('i')));
+
+    expect(await request()).toBe('a');
+    expect(await request()).toBe('b');
+    expect(await request()).toBe('c');
+    expect(await request()).toBe('d');
+    expect(await request()).toBe('e');
+    expect(await request()).toBe('f');
+    expect(await request()).toBe('g');
+    expect(await request()).toBe('h');
+    expect(await request()).toBe('i');
+  });
+});
+  
 it('works globally', async () => {
     const fm = createFetchMock(vi);
     fm.enableMocks();
