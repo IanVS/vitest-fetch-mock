@@ -1,7 +1,7 @@
 import setupFm, { type MockResponse } from 'vitest-fetch-mock';
 import { vi } from 'vitest';
 
-const fetchMock = setupFm(vi);
+const fm = setupFm(vi);
 
 fetchMock.mockResponse(JSON.stringify({foo: "bar"}));
 fetchMock.mockResponse(JSON.stringify({foo: "bar"}), {
@@ -108,10 +108,10 @@ function someSyncStringHandler(): string {
     return JSON.stringify({foo: "bar"});
 }
 
-fetchMock.enableMocks();
-fetchMock.disableMocks();
-fetchMock.doMock();
-fetchMock.dontMock();
-fetchMock.doMockOnce();
-fetchMock.dontMockOnce();
-fetchMock.mockOnce();
+fm.enableMocks();
+fm.disableMocks();
+fm.doMock();
+fm.dontMock();
+fm.doMockOnce();
+fm.dontMockOnce();
+fm.mockOnce();
