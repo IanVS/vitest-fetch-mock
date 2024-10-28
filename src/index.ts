@@ -259,7 +259,7 @@ type UrlOrPredicate = string | RegExp | ((input: Request) => boolean);
 type RequestInput = string | URL | Request;
 type ResponseProvider = ResponseLike | ((request: Request) => ResponseLike | Promise<ResponseLike>);
 type ResponseLike = MockResponse | ResponseBody | Response;
-type ResponseBody = string;
+type ResponseBody = string | null | undefined;
 type ErrorOrFunction = Error | ResponseBody | ResponseProvider;
 
 export interface MockParams {
@@ -351,7 +351,7 @@ async function normalizeResponse(
 
   if (responseLike instanceof Response) {
     return responseLike;
-  } else if (typeof responseLike === 'string') {
+  } else if (typeof responseLike === 'string' || responseLike === null || responseLike === undefined) {
     return new Response(responseLike, params);
   } else {
     return patchUrl(new Response(responseLike.body, { ...params, ...responseLike }), responseLike.url ?? params?.url);
