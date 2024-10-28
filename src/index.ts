@@ -1,7 +1,18 @@
 import { vi as vitest } from 'vitest';
 import type { Mock } from '@vitest/spy';
 
-// type-definitions
+declare global {
+  // eslint-disable-next-line no-var
+  var fetchMock: FetchMock;
+
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    interface Global {
+      fetchMock: FetchMock;
+    }
+  }
+}
+
 export type FetchMock = Mock<typeof global.fetch> & FetchMockObject;
 
 class FetchMockObject {
@@ -16,6 +27,7 @@ class FetchMockObject {
   // enable/disable
   enableMocks(): FetchMock {
     globalThis.fetch = this.mockedFetch;
+    globalThis.fetchMock = this.chainingResultProvider();
     return this.chainingResultProvider();
   }
 
@@ -276,7 +288,7 @@ export default function createFetchMock(vi: typeof vitest): FetchMock {
   }) as FetchMock;
 
   const fetchMock: FetchMock = mockedFetch as FetchMock;
-  const fetchMockObject = new FetchMockObject(mockedFetch, globalThis.fetch, () => fetchMock);
+  const fetchMockObject = new FetchMockObject(mockedFetch, originalFetch, () => fetchMock);
 
   copyMethods(fetchMockObject, fetchMock);
 

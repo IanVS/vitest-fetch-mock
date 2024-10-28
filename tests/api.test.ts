@@ -786,6 +786,16 @@ describe('overloads', () => {
     expect(await request()).toBe('i');
   });
 });
+  
+it('works globally', async () => {
+    const fm = createFetchMock(vi);
+    fm.enableMocks();
+
+    fetchMock.mockResponseOnce('foo');
+    expect(await request()).toBe('foo');
+
+    fm.disableMocks();
+});
 
 it('enable/disable', async () => {
   expect(vi.isMockFunction(globalThis.fetch)).toBe(false);
