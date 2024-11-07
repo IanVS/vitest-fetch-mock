@@ -309,6 +309,33 @@ function requestNotMatches(request: Request, urlOrPredicate: UrlOrPredicate): bo
   return !requestMatches(request, urlOrPredicate);
 }
 
+// Node 18 does not support URL.canParse()
+export function canParseURL(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+// Node Requests cannot be relative
+function resolveInput(input: string): string {
+  if (canParseURL(input)) return input;
+
+  // Window context
+  if (typeof window.document !== 'undefined') {
+    return new URL(input, window.document.baseURI).toString();
+  }
+
+  // Worker context
+  if (typeof location !== 'undefined') {
+    return new URL(input, location.origin).toString();
+  }
+
+  return input;
+}
+
 function normalizeRequest(input: RequestInput, requestInit?: RequestInit): Request {
   if (input instanceof Request) {
     if (input.signal && input.signal.aborted) {
@@ -319,12 +346,12 @@ function normalizeRequest(input: RequestInput, requestInit?: RequestInit): Reque
     if (requestInit && requestInit.signal && requestInit.signal.aborted) {
       abort();
     }
-    return new Request(input, requestInit);
+    return new Request(resolveInput(input), requestInit);
   } else {
     if (requestInit && requestInit.signal && requestInit.signal.aborted) {
       abort();
     }
-    return new Request(input.toString(), requestInit);
+    return new Request(resolveInput(input.toString()), requestInit);
   }
 }
 

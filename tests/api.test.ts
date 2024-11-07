@@ -100,6 +100,14 @@ describe('testing mockResponse', () => {
     expect(fetch.mock.calls[0]![0]).toEqual(new URL('https://instagram.com'));
   });
 
+  it('should support relative request urls', async () => {
+    fetch.mockResponseOnce(JSON.stringify({ data: 'abcde' }), { status: 200 });
+
+    const response = await fetch('folder/file.json').then((res) => res.json());
+
+    expect(response).toEqual({ data: 'abcde' });
+  });
+
   it('should allow empty response bodies', async () => {
     fetch.mockResponseOnce(null, { status: 204 });
     fetch.mockResponseOnce(undefined, { status: 204 });
