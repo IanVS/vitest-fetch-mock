@@ -13,10 +13,10 @@
     "type-check": "tsc",
     "test": "vitest run",
     "test:watch": "vitest run --watch",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "format": "prettier src --write",
-    "format:check": "prettier src --check",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "format": "prettier src tests --write",
+    "format:check": "prettier src tests --check",
     "build": "tsc -p tsconfig.build.json"
   },
   "repository": {

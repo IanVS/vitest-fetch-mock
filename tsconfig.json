@@ -3,7 +3,8 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": [
-      "es2022"
+      "es2022",
+      "dom",
     ],
     "baseUrl": "./",
     "paths": {

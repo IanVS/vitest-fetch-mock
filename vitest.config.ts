@@ -6,4 +6,7 @@ export default defineConfig({
       'vitest-fetch-mock': './src/index',
     },
   },
+  test: {
+    environment: 'jsdom',
+  },
 });
