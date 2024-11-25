@@ -406,7 +406,7 @@ const normalizeError = async (request: Request, errorOrFunction?: ErrorOrFunctio
       : Promise.reject(errorOrFunction);
 
 function abortError(): Error {
-  return new DOMException('The operation was aborted.');
+  return new DOMException('The operation was aborted.', 'AbortError');
 }
 
 function abort(): never {
