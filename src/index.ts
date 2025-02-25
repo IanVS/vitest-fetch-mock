@@ -324,7 +324,7 @@ function resolveInput(input: string): string {
   if (canParseURL(input)) return input;
 
   // Window context
-  if (typeof window.document !== 'undefined') {
+  if (typeof window !== 'undefined' && typeof window.document !== 'undefined') {
     return new URL(input, window.document.baseURI).toString();
   }
 
