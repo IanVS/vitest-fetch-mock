@@ -1,5 +1,4 @@
-import { vi as vitest } from 'vitest';
-import type { Mock } from '@vitest/spy';
+import { vi as vitest, type Mock } from 'vitest';
 
 declare global {
   // eslint-disable-next-line no-var
