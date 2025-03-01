@@ -255,12 +255,12 @@ class FetchMockObject {
   }
 }
 
-type UrlOrPredicate = string | RegExp | ((input: Request) => boolean);
-type RequestInput = string | URL | Request;
-type ResponseProvider = ResponseLike | ((request: Request) => ResponseLike | Promise<ResponseLike>);
-type ResponseLike = MockResponse | ResponseBody | Response;
-type ResponseBody = string | null | undefined;
-type ErrorOrFunction = Error | ResponseBody | ResponseProvider;
+export type UrlOrPredicate = string | RegExp | ((input: Request) => boolean);
+export type RequestInput = string | URL | Request;
+export type ResponseProvider = ResponseLike | ((request: Request) => ResponseLike | Promise<ResponseLike>);
+export type ResponseLike = MockResponse | ResponseBody | Response;
+export type ResponseBody = string | null | undefined;
+export type ErrorOrFunction = Error | ResponseBody | ResponseProvider;
 
 export interface MockParams {
   status?: number;
