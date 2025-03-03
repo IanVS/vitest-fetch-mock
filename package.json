@@ -1,6 +1,6 @@
 {
   "name": "vitest-fetch-mock",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "fetch mock for vitest",
   "type": "module",
   "main": "./dist/index.js",
